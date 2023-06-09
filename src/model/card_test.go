@@ -21,5 +21,4 @@ func TestCardType(t *testing.T) {
 	if cardType != expectedType {
 		t.Fail()
 	}
-
 }
