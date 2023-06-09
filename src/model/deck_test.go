@@ -9,7 +9,7 @@ import (
 )
 
 func generateTestDeck() (model.Deck, error) {
-	absPath, pathErr := filepath.Abs("../resources/greenApples.txt")
+	absPath, pathErr := filepath.Abs("../resources/testSet.txt")
 	if pathErr != nil {
 		return *new(model.Deck), errors.New("test incorrectly configured, invalid resource path")
 	}
@@ -115,6 +115,35 @@ func TestShuffle(t *testing.T) {
 	}
 	if coincidense >= confidence/2 {
 		t.Log("warning, shuffling overlap exceeding expectations")
+		t.Fail()
+	}
+}
+
+func TestCombineShuffle(t *testing.T) {
+	testDeck, _ := generateTestDeck()
+	for testDeck.CardsLeft() > 0  {
+		card, err := testDeck.DrawCard()
+		if err != nil {
+			t.Log("test overdrawing from test deck")
+			t.Fail()
+		}
+		typeErr := testDeck.DiscardCard(card)
+		if typeErr != nil {
+			t.Log("type missmatch, cards are not same type as deck")
+			t.Fail()
+		}
+	}
+	shuffleErr := testDeck.CombineShuffle()
+	if shuffleErr != nil {
+		t.Log(shuffleErr)
+		t.Fail()
+	}
+	if testDeck.CardsLeft() != 100 {
+		t.Log("deck size missmatch: expected 100 cards in deck, have", testDeck.CardsLeft())
+		t.Fail()
+	}
+	if testDeck.CardsInPile() != 0 {
+		t.Log("deck size missmatch: expected 0 cards in pile, have", testDeck.CardsInPile())
 		t.Fail()
 	}
 }

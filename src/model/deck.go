@@ -15,7 +15,7 @@ type Deck struct {
 }
 
 /*
-Creates a new Deck with initial capacity of 200 cards.
+Creates a new Deck with given type.
 */
 func CreateDeck(deckType string) Deck {
 	newDeck := *new(Deck)
@@ -33,6 +33,14 @@ func (d *Deck) setDeckType(cardType string) error {
 	}
 	d.allowedCardType = cardType
 	return nil
+}
+
+func (d *Deck) CardsLeft() int {
+	return len(d.deck)
+}
+
+func (d *Deck) CardsInPile() int {
+	return len(d.discard)
 }
 
 /*
@@ -96,7 +104,7 @@ func formatDescription(card *string) {
 }
 
 /*
-In place shuffling of a deck, the discard pile will not be shuffled.
+In-place shuffling of a deck, the discard pile will not be shuffled.
 */
 func (d *Deck) ShuffleDeck() error {
 	if len(d.deck) < 1 {
@@ -109,4 +117,11 @@ func (d *Deck) ShuffleDeck() error {
 		}
 	}
 	return nil
+}
+
+func (d *Deck) CombineShuffle() error {
+	d.deck = append(d.deck, d.discard...)
+	d.discard = *new([]Card)
+	err := d.ShuffleDeck()
+	return err
 }
