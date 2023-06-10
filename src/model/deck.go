@@ -15,24 +15,46 @@ type Deck struct {
 }
 
 /*
+Creates a Deck from a text file with the given type "deckType". 
+A Deck contains both the deck and a discard pile for the deck.
+
+Errors on incorrect file path.
+*/
+func GenerateDeck(source string, deckType string) (Deck, error) {
+	f, fileErr := os.Open(source)
+	if fileErr != nil {
+		return Deck{}, fileErr
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+
+	deck := createDeck(deckType)
+	
+	for scanner.Scan() { 
+		cardData := strings.Split(scanner.Text(), " - ")
+		formatDescription((&cardData[1])) // Remove parenthesis from description using a in-place function.
+
+		newCard := MintCard(deckType, cardData[0], cardData[1])
+		deck.deck = append(deck.deck, newCard)
+	}
+	return deck, nil
+}
+
+/*
 Creates a new Deck with given type.
 */
-func CreateDeck(deckType string) Deck {
+func createDeck(deckType string) Deck {
 	newDeck := *new(Deck)
 	newDeck.setDeckType(deckType)
 	return newDeck
 }
 
 /*
-Set the type of cards that are accepted in the Deck.
+Removes the surrounding parenthesis from the description, note that there is a trailing white space at the end.
 */
-func (d *Deck) setDeckType(cardType string) error {
-	// If a deck already contain cards the allowed types can not be changed.
-	if (len(d.deck) > 0 || len(d.discard) > 0) {
-		return errors.New("can not change type of non-empty deck")
-	}
-	d.allowedCardType = cardType
-	return nil
+func formatDescription(card *string) {
+	*card = strings.Trim(*card, "(")
+	*card = strings.Trim(*card, ") ")
 }
 
 func (d *Deck) CardsLeft() int {
@@ -70,40 +92,6 @@ func (d *Deck) DiscardCard(card Card) error {
 }
 
 /*
-Creates a Deck from a text file with the given type "deckType". 
-A Deck contains both the deck and a discard pile for the deck.
-
-Errors on incorrect file path.
-*/
-func GenerateDeck(source string, deckType string) (Deck, error) {
-	f, fileErr := os.Open(source)
-	if fileErr != nil {
-		return Deck{}, fileErr
-	}
-	defer f.Close()
-	scanner := bufio.NewScanner(f)
-
-	deck := CreateDeck(deckType)
-	
-	for scanner.Scan() { 
-		cardData := strings.Split(scanner.Text(), " - ")
-		formatDescription((&cardData[1])) // Remove parenthesis from description using a in-place function.
-
-		newCard := MintCard(deckType, cardData[0], cardData[1])
-		deck.deck = append(deck.deck, newCard)
-	}
-	return deck, nil
-}
-
-/*
-Removes the surrounding parenthesis from the description, note that there is a trailing white space at the end.
-*/
-func formatDescription(card *string) {
-	*card = strings.Trim(*card, "(")
-	*card = strings.Trim(*card, ") ")
-}
-
-/*
 In-place shuffling of a deck, the discard pile will not be shuffled.
 */
 func (d *Deck) ShuffleDeck() error {
@@ -119,9 +107,23 @@ func (d *Deck) ShuffleDeck() error {
 	return nil
 }
 
-func (d *Deck) CombineShuffle() error {
+/*
+Append  the discard pile to the deck then shuffle it. 
+*/
+func (d *Deck) CombineShuffle() {
 	d.deck = append(d.deck, d.discard...)
 	d.discard = *new([]Card)
-	err := d.ShuffleDeck()
-	return err
+	d.ShuffleDeck()
+}
+
+/*
+Set the type of cards that are accepted in the Deck.
+*/
+func (d *Deck) setDeckType(cardType string) error {
+	// If a deck already contain cards the allowed types can not be changed.
+	if (len(d.deck) > 0 || len(d.discard) > 0) {
+		return errors.New("can not change type of non-empty deck")
+	}
+	d.allowedCardType = cardType
+	return nil
 }
