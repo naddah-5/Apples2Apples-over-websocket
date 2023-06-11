@@ -6,14 +6,18 @@ import (
 )
 
 func generateTestPlayer() model.Player {
-	player := model.NewPlayer("test player", false, 7)
-	return player
+	player := model.NewPlayer("test player", true, false, 7)
+	return *player
 }
 
 func TestGeneratePlayerAndGetters(t *testing.T) {
 	player := generateTestPlayer()
 	if player.PlayerName() != "test player" {
 		t.Log("unexpected player name")
+		t.FailNow()
+	}
+	if !player.Host() {
+		t.Log("unexpected host status")
 		t.FailNow()
 	}
 	if player.Bot() {
@@ -73,7 +77,7 @@ func TestPlayerDrawCardCombineShuffle(t *testing.T) {
 		t.Log(deckErr)
 		t.FailNow()
 	}
-
+	
 	// Move 95 cards from the testDecks deck to its pile.
 	for i := 0; i < 95; i++ {
 		rotateCard, rotateErr := testDeck.DrawCard()
@@ -87,7 +91,7 @@ func TestPlayerDrawCardCombineShuffle(t *testing.T) {
 			t.FailNow()
 		}
 	}
-
+	
 	playerDrawErr := player.DrawCard(&testDeck)
 	if playerDrawErr != nil {
 		t.Log(playerDrawErr)

@@ -4,6 +4,7 @@ import "errors"
 
 type Player struct {
 	name string
+	host bool
 	bot bool
 	hand []Card
 	handCapacity int
@@ -13,15 +14,16 @@ type Player struct {
 /*
 Creates and returns a new player.
 */
-func NewPlayer(playerName string, bot bool, handCapacity int) Player {
+func NewPlayer(playerName string, host bool, bot bool, handCapacity int) *Player {
 	player := Player{
 		name: playerName,
+		host: host,
 		bot: bot,
 		hand: *new([]Card),
 		handCapacity: handCapacity,
 		points: *new([]Card),
 	}
-	return player
+	return &player
 }
 
 /*
@@ -29,6 +31,13 @@ Returns the players name.
 */
 func (p *Player) PlayerName() string {
 	return p.name
+}
+
+/*
+Returns true if the player is the host.
+*/
+func (p *Player) Host() bool {
+	return p.host
 }
 
 /*
