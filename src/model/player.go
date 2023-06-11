@@ -13,12 +13,12 @@ type Player struct {
 /*
 Creates and returns a new player.
 */
-func NewPlayer(playerName string, bot bool) Player {
+func NewPlayer(playerName string, bot bool, handCapacity int) Player {
 	player := Player{
 		name: playerName,
 		bot: bot,
 		hand: *new([]Card),
-		handCapacity: 7,
+		handCapacity: handCapacity,
 		points: *new([]Card),
 	}
 	return player
@@ -36,6 +36,13 @@ Returns true if the player is a bot.
 */
 func (p *Player) Bot() bool {
 	return p.bot
+}
+
+/*
+Returns the players hand capacity.
+*/
+func (p *Player) HandCapacity() int {
+	return p.handCapacity
 }
 
 /*
@@ -65,24 +72,12 @@ Returns a card from the player hands, and removes it from that players hand.
 Returns error if a invalid index is given.
 */
 func (p *Player) PlayCard(index int) (Card, error) {
-	if index < 0 || len(p.hand) < index {
+	if index < 0 || len(p.hand)-1 < index {
 		return *new(Card), errors.New("invalid card index")
 	}
 	card := p.hand[index]
-	var boundedCut int = max((index-1), 0)
-	p.hand = append(p.hand[:boundedCut], p.hand[index:]...)
+	p.hand = append(p.hand[:index], p.hand[index+1:]...)
 	return card, nil
-}
-
-/*
-Returns the larger of two integers, if they are the same size 
-the first argument is returned.
-*/
-func max(a int, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }
 
 /*
@@ -90,7 +85,7 @@ Adds the given card to player points and returns the players
 score using the Score() function.
 */
 func (p *Player) IncreaseScore(card Card) int {
-	p.hand = append(p.hand, card)
+	p.points = append(p.points, card)
 	return p.Score()
 }
 
@@ -107,4 +102,8 @@ Returns a COPY of the players hand, do not discard these cards into a pile.
 */
 func (p *Player) PlayerHand() []Card {
 	return p.hand
+}
+
+func (p *Player) CardsInHand() int {
+	return len(p.hand)
 }
