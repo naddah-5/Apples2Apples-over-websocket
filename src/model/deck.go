@@ -57,10 +57,16 @@ func formatDescription(card *string) {
 	*card = strings.Trim(*card, ") ")
 }
 
+/*
+Returns how many cards are left in the shuffled deck as an int.
+*/
 func (d *Deck) CardsLeft() int {
 	return len(d.deck)
 }
 
+/*
+Returns how many cards there are in the discard pile as an int.
+*/
 func (d *Deck) CardsInPile() int {
 	return len(d.discard)
 }
