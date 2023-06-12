@@ -15,7 +15,7 @@ type Player struct {
 Creates and returns a new player.
 */
 func NewPlayer(playerName string, host bool, bot bool, handCapacity int) *Player {
-	player := Player{
+	return &Player{
 		name: playerName,
 		host: host,
 		bot: bot,
@@ -23,7 +23,6 @@ func NewPlayer(playerName string, host bool, bot bool, handCapacity int) *Player
 		handCapacity: handCapacity,
 		points: *new([]Card),
 	}
-	return &player
 }
 
 /*

@@ -18,21 +18,19 @@ type PlayerPlayed struct{
 Constructs and returns a PlayerPlays struct from the input.
 */
 func PlayerPlays(player *Player, card Card) PlayerPlayed {
-	pp := PlayerPlayed{
+	return PlayerPlayed{
 		player,
 		card,
 	}
-	return pp
 }
 
 /*
 Constructs and returns a PlayedApples struct from the input.
 */
 func PlayedRound(pp []PlayerPlayed) PlayedApples {
-	pa := PlayedApples{
+	return PlayedApples{
 		pp: pp,
 	}
-	return pa
 }
 
 func (pa *PlayedApples) PlayerCount() int {
