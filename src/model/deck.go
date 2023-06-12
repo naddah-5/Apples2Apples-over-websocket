@@ -50,11 +50,12 @@ func createDeck(deckType string) Deck {
 }
 
 /*
-Removes the surrounding parenthesis from the description, note that there is a trailing white space at the end.
+Removes the surrounding parenthesis from the description.
 */
 func formatDescription(card *string) {
+	*card = strings.TrimSpace(*card)
 	*card = strings.Trim(*card, "(")
-	*card = strings.Trim(*card, ") ")
+	*card = strings.Trim(*card, ")")
 }
 
 /*
