@@ -64,6 +64,10 @@ func TestDiscardCardValid(t *testing.T) {
 		t.Log("unexpected error ", discarErr)
 		t.Fail()
 	}
+	if testDeck.CardsInPile() + testDeck.CardsLeft() != 100 {
+		t.Log("expected 100 cards in total, found", testDeck.CardsInPile() + testDeck.CardsLeft())
+		t.FailNow()
+	}
 }
 func TestDiscardCardInvalid(t *testing.T) {
 	testDeck, deckErr := generateTestDeck()
