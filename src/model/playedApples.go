@@ -14,6 +14,31 @@ type PlayerPlayed struct{
 	card Card
 }
 
+/*
+Constructs and returns a PlayerPlays struct from the input.
+*/
+func PlayerPlays(player *Player, card Card) PlayerPlayed {
+	pp := PlayerPlayed{
+		player,
+		card,
+	}
+	return pp
+}
+
+/*
+Constructs and returns a PlayedApples struct from the input.
+*/
+func PlayedRound(pp []PlayerPlayed) PlayedApples {
+	pa := PlayedApples{
+		pp: pp,
+	}
+	return pa
+}
+
+func (pa *PlayedApples) PlayerCount() int {
+	return len(pa.pp)
+}
+
 
 /*
 Shuffles the order of the submitted cards.
@@ -50,6 +75,7 @@ func (pa *PlayedApples) DisplayApples() ([]string, error) {
 /*
 Returns the player name of the chosen index, usefull for showing who 
 won the round when the judge chooses a winning card.
+Returns an error if index is out of bounds.
 */
 func (pa *PlayedApples) ShowPlayer(index int) (string, error) {
 	if index < 0 || index >= len(pa.pp) {
