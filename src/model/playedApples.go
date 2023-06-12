@@ -42,6 +42,7 @@ func (pa *PlayedApples) PlayerCount() int {
 
 /*
 Shuffles the order of the submitted cards.
+
 Returns an error if there are no submissions.
 */
 func (pa *PlayedApples) Shuffle() error {
@@ -59,6 +60,7 @@ func (pa *PlayedApples) Shuffle() error {
 
 /*
 Returns the display card results for all played cards, in order.
+
 Returns error if there are no cards in the struct.
 */
 func (pa *PlayedApples) DisplayApples() ([]string, error) {
@@ -75,6 +77,7 @@ func (pa *PlayedApples) DisplayApples() ([]string, error) {
 /*
 Returns the player name of the chosen index, usefull for showing who 
 won the round when the judge chooses a winning card.
+
 Returns an error if index is out of bounds.
 */
 func (pa *PlayedApples) ShowPlayer(index int) (string, error) {
@@ -87,6 +90,7 @@ func (pa *PlayedApples) ShowPlayer(index int) (string, error) {
 /*
 Discards all cards in PlayedApples and replace them with empty cards 
 so that they are not accidentally used again.
+
 Returns an error if the injected deck does not match the card type.
 */
 func (pa *PlayedApples) DiscardRound(deck *Deck) error {

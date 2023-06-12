@@ -18,7 +18,7 @@ type Deck struct {
 Creates a Deck from a text file with the given type "deckType". 
 A Deck contains both the deck and a discard pile for the deck.
 
-Errors on incorrect file path.
+Returns an errors on incorrect file path.
 */
 func GenerateDeck(source string, deckType string) (Deck, error) {
 	f, fileErr := os.Open(source)
@@ -75,7 +75,7 @@ func (d *Deck) CardsInPile() int {
 /*
 Draw the first card from the Deck.
 
-Returns error if there are no cards in the deck
+Returns an error if there are no cards in the deck
 */
 func (d *Deck) DrawCard() (Card, error) {
 	if len(d.deck) < 1 {
@@ -87,8 +87,9 @@ func (d *Deck) DrawCard() (Card, error) {
 }
 
 /*
-Add a card to the discard pile, returns error if the card type 
-does not match the pile type.
+Add a card to the discard pile. 
+
+Returns error if the card type does not match the deck type.
 */
 func (d *Deck) DiscardCard(card Card) error {
 	if card.cardType != d.allowedCardType {
