@@ -52,7 +52,7 @@ Returns the players hand capacity.
 */
 func (p *Player) HandCapacity() int {
 	return p.handCapacity
-}
+} 
 
 /*
 Player draws card until hand is full. If deck runs out before that, 

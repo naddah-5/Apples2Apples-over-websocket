@@ -6,18 +6,13 @@ import (
 	"math/rand"
 )
 
-type playerPlayed struct {
-	player Player
-	card Card
-}
-
 type Game struct {
 	network network.Network
 	players []Player
 	judge int
 	redApples Deck
 	greenApples Deck
-	playedCards []playerPlayed
+	playedCards []PlayedApples
 }
 
 /*
@@ -106,4 +101,5 @@ func (g *Game) LoadGreenApples(source string) error {
 	g.greenApples = greenAppleDeck
 	return nil
 }
+
 
