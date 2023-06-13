@@ -8,9 +8,9 @@ import (
 func generateTestPA(testDeck *model.Deck) model.PlayedApples {	
 	var roundList []model.PlayerPlayed
 	playerOne := *model.NewPlayer("player one", true, false, 7)
-	playerTwo := *model.NewPlayer("player two", false, false, 7)
-	playerThree := *model.NewPlayer("player three", false, false, 7)
-	playerFour := *model.NewPlayer("player four", false, false, 7)
+	playerTwo := *model.NewPlayer("player two", false, true, 7)
+	playerThree := *model.NewPlayer("player three", false, true, 7)
+	playerFour := *model.NewPlayer("player four", false, true, 7)
 
 	cardOne, _ := testDeck.DrawCard()
 	cardTwo, _ := testDeck.DrawCard()

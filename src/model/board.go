@@ -13,7 +13,9 @@ type Board struct {
 	redApples Deck
 	greenApples Deck
 	playedCards []PlayedApples
+	winCondition int
 }
+
 
 /*
 Adds a player to the board unless the player name is 
@@ -66,8 +68,12 @@ func (b *Board) ShufflePlayers() error {
 /*
 Returns current judge index.
 */
-func (b *Board) CurrentJudge() int {
+func (b *Board) CurrentJudgeIndex() int {
 	return b.judge
+}
+
+func (b *Board) CurrentJudgeName() string {
+	return b.players[b.CurrentJudgeIndex()].PlayerName()
 }
 
 /*
@@ -109,4 +115,60 @@ func (b *Board) LoadGreenApples(source string) error {
 	return nil
 }
 
+/*
+Define the win condition 
+*/
+func (b *Board) SetWinCondition() error {
+	if len(b.players) < 4 {
+		return errors.New("not enough players")
+	}
+	b.winCondition = max(4, 12 - len(b.players))
+	return nil
+}
 
+func max(a int, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+
+/*
+Returns the win condition, primarily usefull for testing.
+*/
+func (b *Board) GetWinCondition() int {
+	return b.winCondition
+}
+
+
+/*
+Check if any player satisfy the win condition.
+
+Returns an error if the win condition is not set correctly.
+*/
+func (b *Board) Winner() (bool, error) {
+	if b.winCondition <= 0 {
+		return false, errors.New("invalid win condition")
+	}
+	for i := 0; i < len(b.players); i++ {
+		if b.players[i].Score() >= b.winCondition {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+/*
+Returns a player that satisfy the win condition.
+
+Returns an error if there is no player satisfying the win condition.
+*/
+func (b *Board) WhoWon() (Player, error) {
+	for i := 0; i < len(b.players); i++ {
+		if b.players[i].Score() >= b.winCondition {
+			return b.players[i], nil
+		}
+	}
+	return *new(Player), errors.New("there is no winner")
+}
