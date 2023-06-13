@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"main/network"
 	"math/rand"
 )
@@ -45,6 +46,33 @@ func (b *Board) validateName(name string) bool {
 }
 
 /*
+Returns a pointer to the player matching the player name.
+
+Returns an error if there are no matches.
+*/
+func (b *Board) findPlayer(playerName string) (*Player, error) {
+	for i := 0; i < len(b.players); i++ {
+		if b.players[i].PlayerName() == playerName {
+			return &b.players[i], nil
+		}
+	}
+	return new(Player), errors.New("player not found")
+}
+
+/*
+Returns the string representation of players and their score.
+*/
+func (b *Board) DisplayScoreBoard() []string {
+	var playerScores []string
+	for i := 0; i < len(b.players); i++ {
+		playerName := b.players[i].PlayerName()
+		playerScore := b.players[i].Score()
+		playerScores = append(playerScores, playerName + ": \t" + fmt.Sprint(playerScore))
+	}
+	return playerScores
+}
+
+/*
 Shuffle the player order. 
 
 Returns an error if there are no players.
@@ -85,6 +113,20 @@ func (b *Board) ItterateJudge() int {
 		b.judge = 0
 	}
 	return b.judge
+}
+
+/*
+Awards the scoreCard to the player whos name matches playerName.
+
+Returns an error if there is no player with that name.
+*/
+func (b *Board) AwardScore(playerName string, scoreCard Card) error {
+	player, err := b.findPlayer(playerName)
+	if err != nil {
+		return err
+	}
+	player.IncreaseScore(scoreCard)
+	return nil
 }
 
 /*

@@ -183,3 +183,122 @@ func TestSetWinCondition(t *testing.T) {
 		t.FailNow()
 	}	
 }
+
+func TestWinCheck(t *testing.T) {
+	playerOne := *model.NewPlayer("player one", true, false, 7)
+	playerTwo := *model.NewPlayer("player two", false, false, 7)
+	playerThree := *model.NewPlayer("player three", false, false, 7)
+	playerFour := *model.NewPlayer("player four", false, false, 7)
+	
+	var board model.Board = *new(model.Board)
+
+	board.AddPlayer(playerOne)
+	board.AddPlayer(playerTwo)
+	board.AddPlayer(playerThree)
+	board.AddPlayer(playerFour)
+	board.SetWinCondition()
+
+	testDeck, testErr := generateTestDeck()
+	if testErr != nil {
+		t.Log("incorrectly configured test, generate deck error detected", testErr)
+		t.FailNow()
+	}
+	for i := 0; i < 4; i++ {
+		scoreCard, drawErr := testDeck.DrawCard()
+		if drawErr != nil {
+			t.Log("incorrectly configured test, draw error detected", drawErr)
+		}
+		board.AwardScore(playerOne.PlayerName(), scoreCard)
+	}
+
+	winConditionMet, winErr := board.Winner()
+	if winErr != nil {
+		t.Log("unexpected error: ", winErr)
+		t.FailNow()
+	}
+	if winConditionMet {
+		t.Log("unexpected win condition")
+		t.FailNow()
+	}
+
+	for i := 0; i < 8; i++ {
+		scoreCard, drawErr := testDeck.DrawCard()
+		if drawErr != nil {
+			t.Log("incorrectly configured test, draw error detected", drawErr)
+		}
+		board.AwardScore(playerTwo.PlayerName(), scoreCard)
+	}
+
+	winConditionMet2, _ := board.Winner()
+	if !winConditionMet2 {
+		t.Log("expected to have a winner")
+		t.FailNow()
+	}
+
+	winner, winConErr := board.WhoWon()
+	if winConErr != nil {
+		t.Log("unexpected error:", winConErr)
+		t.FailNow()
+	}
+	winnerName := winner.PlayerName()
+	if winnerName != "player two" {
+		t.Log("expected player two to win")
+		t.FailNow()
+	}
+}
+
+func TestWinConditionMorePlayers(t *testing.T) {
+	playerOne := *model.NewPlayer("player one", true, false, 7)
+	playerTwo := *model.NewPlayer("player two", false, false, 7)
+	playerThree := *model.NewPlayer("player three", false, false, 7)
+	playerFour := *model.NewPlayer("player four", false, false, 7)
+	playerFive := *model.NewPlayer("player five", false, false, 7)
+	playerSix := *model.NewPlayer("player six", false, false, 7)
+	playerSeven := *model.NewPlayer("player seven", false, false, 7)
+	
+
+
+	var board model.Board = *new(model.Board)
+
+	board.AddPlayer(playerOne)
+	board.AddPlayer(playerTwo)
+	board.AddPlayer(playerThree)
+	board.AddPlayer(playerFour)
+	board.AddPlayer(playerFive)
+	board.AddPlayer(playerSix)
+	board.AddPlayer(playerSeven)
+	board.SetWinCondition()
+
+	testDeck, testErr := generateTestDeck()
+	if testErr != nil {
+		t.Log("incorrectly configured test, generate deck error detected", testErr)
+		t.FailNow()
+	}
+
+	for i := 0; i < 5; i++ {
+		scoreCard, drawErr := testDeck.DrawCard()
+		if drawErr != nil {
+			t.Log("incorrectly configured test, draw error detected", drawErr)
+		}
+		board.AwardScore(playerThree.PlayerName(), scoreCard)
+	}
+	winConditionMet, winErr := board.Winner()
+	if winErr != nil {
+		t.Log("unexpected error: ", winErr)
+		t.FailNow()
+	}
+	if !winConditionMet {
+		t.Log("expected win condition")
+		t.FailNow()
+	}
+	winner, winPlayErr := board.WhoWon()
+	if winPlayErr != nil {
+		t.Log("expected a winner, received error:", winPlayErr)
+		t.FailNow()
+	}
+	winnerName := winner.PlayerName()
+	if winnerName != "player three" {
+		t.Log("unexpected winner, expected player three to win, actually ", winnerName)
+		t.FailNow()
+	}
+}
