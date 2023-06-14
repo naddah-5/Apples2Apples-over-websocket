@@ -37,6 +37,9 @@ func (pa *PlayedApples) PlayerCount() int {
 	return len(pa.pp)
 }
 
+/*
+Submit a card from a player to the PlayedApples struct.
+*/
 func (pa *PlayedApples) SubmitCard(player *Player, card Card) {
 	submission := PlayerPlayed{
 		player: player,
@@ -99,13 +102,14 @@ so that they are not accidentally used again.
 
 Returns an error if the injected deck does not match the card type.
 */
-func (pa *PlayedApples) DiscardRound(deck *Deck) error {
+func (pa *PlayedApples) DiscardRound(deck *Deck) ([]Card, error) {
+	var failedDiscards []Card
 	for i := 0; i < len(pa.pp); i++ {
 		disErr := deck.DiscardCard(pa.pp[i].card)
 		if disErr != nil {
-			return disErr
+			failedDiscards = append(failedDiscards, pa.pp[i].card)
 		}
-		pa.pp[i].card = *new(Card)
 	}
-	return nil
+	pa.pp = *new([]PlayerPlayed) // Makes sure that cards are not duplicated.
+	return failedDiscards, nil
 }

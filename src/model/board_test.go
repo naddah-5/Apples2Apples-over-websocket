@@ -360,6 +360,7 @@ func TestChooseCard(t *testing.T) {
 	loadErr := board.LoadRedApples(absPath)
 	if loadErr != nil {
 		t.Log("test incorrectly configured, ", loadErr.Error())
+		t.FailNow()
 	}
 	fillErr := board.FillHands()
 	if fillErr != nil {
@@ -367,18 +368,84 @@ func TestChooseCard(t *testing.T) {
 		t.FailNow()
 	}
 
-	pa, err := board.ChooseCards()
+	err := board.ChooseCards()
 	if err != nil {
 		t.Log(err)
 		t.FailNow()
 	}
-	playedCards, pErr := pa.DisplayApples()
+	playedCards, pErr := board.PlayedCards.DisplayApples()
 	if pErr != nil {
 		t.Log(pErr)
 		t.FailNow()
 	}
 	if len(playedCards) != 3 {
 		t.Log("did not receive the expected number of apples, received", len(playedCards), "expected 3")
+		t.FailNow()
+	}
+}
+
+func TestJudge(t *testing.T) {
+	playerOne := *model.NewPlayer("player one", false, true, 7)
+	playerTwo := *model.NewPlayer("player two", false, true, 7)
+	playerThree := *model.NewPlayer("player three", false, true, 7)
+	playerFour := *model.NewPlayer("player four", false, true, 7)
+	
+	var board model.Board = *new(model.Board)
+
+	board.AddPlayer(playerOne)
+	board.AddPlayer(playerTwo)
+	board.AddPlayer(playerThree)
+	board.AddPlayer(playerFour)
+	board.SetWinCondition()
+
+	redPath, redPathErr := filepath.Abs("../resources/testSetRA.txt")
+	if redPathErr != nil {
+		t.Log("test incorrectly configured, invalid resource path")
+		t.FailNow()
+	}
+	loadRedErr := board.LoadRedApples(redPath)
+	if loadRedErr != nil {
+		t.Log("test incorrectly configured, ", loadRedErr)
+		t.FailNow()
+	}
+	greenPath, greenPathErr := filepath.Abs("../resources/testSetGA.txt")
+	if greenPathErr != nil {
+		t.Log("test incorrectly configured, invalid resource path")
+		t.FailNow()
+	}
+	loadGreenErr := board.LoadGreenApples(greenPath)
+	if loadGreenErr != nil {
+		t.Log("test incorrectly configured, ", loadGreenErr)
+		t.FailNow()
+	}
+	fillErr := board.FillHands()
+	if fillErr != nil {
+		t.Log("could not draw cards, ", fillErr)
+		t.FailNow()
+	}
+
+	greenDrawErr := board.DrawGreenApple()
+	if greenDrawErr != nil {
+		t.Log(greenDrawErr)
+		t.FailNow()
+	}
+	playerDrawErr := board.ChooseCards()
+	if playerDrawErr != nil {
+		t.Log(playerDrawErr)
+		t.FailNow()
+	}
+	winnerIndex, judgeErr := board.Judge()
+	if judgeErr != nil {
+		t.Log(judgeErr)
+		t.FailNow()
+	}
+	playedApples, dispErr := board.PlayedCards.DisplayApples()
+	if dispErr != nil {
+		t.Log(dispErr)
+		t.FailNow()
+	}
+	if playedApples[winnerIndex] == "" {
+		t.Log("expected non-empty card")
 		t.FailNow()
 	}
 }

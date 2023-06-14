@@ -68,7 +68,17 @@ func clear() error {
 	return errors.New("Unsupported OS")
 }
 
+/*
+Print out the players hand and current green apple, take which card to play from terminal in the form of an index int.
+*/
+func ChooseCard(greenApple string, hand []string) int {
+	return 0
+}
 
-func ChooseCard() int {
+/*
+Print out the submitted red apples and current grren apple, take the winning red apples index from terminal in the 
+form of an index int.
+*/
+func JudgeCards(greenApple string, redApples []string) int {
 	return 0
 }

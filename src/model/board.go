@@ -16,7 +16,7 @@ type Board struct {
 	currentGreenApple Card
 	redApples Deck
 	greenApples Deck
-	playedCards []PlayedApples
+	PlayedCards PlayedApples
 	winCondition int
 }
 
@@ -279,29 +279,32 @@ func (b *Board) WhoWonGame() (Player, error) {
 Goes through all players and retrieves which card they want to play. Returns the 
 PlayedApples struct containing all played cards.
 
-Returns an error if a player tries to play an invalid card index.
+Returns an error if a player plays an invalid card index, this should cause a panic.
+Meaning that this method should not be used to validate user input.
 */
-func (b *Board) ChooseCards() (PlayedApples, error) {
+func (b *Board) ChooseCards() error {
 	pa := new(PlayedApples)
 	currentJudge := b.CurrentJudgeName()
+	greenApple := b.CurrentGreenApple()
 	for i := 0; i < len(b.players); i++ {
 		if b.players[i].PlayerName() == currentJudge {
-			// skips the host
+			// skips the judge
 			continue
 		}
 		if b.players[i].Bot() {
 			var randomCardIndex int = rand.Intn(b.players[i].CardsInHand())
 			card, cardErr := b.players[i].PlayCard(randomCardIndex)
 			if cardErr != nil {
-				return *pa, errors.New("bot tried to play invalid card, " + cardErr.Error())
+				return errors.New("bot tried to play invalid card, " + cardErr.Error())
 			}
 			pa.SubmitCard(&b.players[i], card)
 		}
-		if b.players[i].Host() {
-			cardIndex := view.ChooseCard()
+		if b.players[i].Host() && !b.players[i].Bot() {
+			hand := b.players[i].ShowHand()
+			cardIndex := view.ChooseCard(greenApple, hand)
 			card, playerCardErr := b.players[i].PlayCard(cardIndex)
 			if playerCardErr != nil {
-				return *pa, errors.New("host tried to play invalid card, " + playerCardErr.Error())
+				return errors.New("host tried to play invalid card, " + playerCardErr.Error())
 			}
 			pa.SubmitCard(&b.players[i], card)
 		}
@@ -311,7 +314,8 @@ func (b *Board) ChooseCards() (PlayedApples, error) {
 			*/
 		}
 	}
-	return *pa, nil
+	b.PlayedCards = *pa
+	return nil
 }
 
 /*
@@ -328,4 +332,35 @@ func (b *Board) FillHands() error {
 		}
 	}
 	return nil
+}
+
+/*
+Calls for the judge to decide the round winner.
+The round winner is given by their index in the 
+PlayersPlayed.pp struct.
+
+Returns an error if no apples have been played.
+*/
+func (b *Board) Judge() (int, error) {	
+	var greenApple string = b.CurrentGreenApple()
+	currentJudge := b.players[b.currentJudgeIndex()]
+	redApples, err := b.PlayedCards.DisplayApples()
+	if err != nil {
+		return -1, errors.New("no apples played")
+	}
+	
+	if currentJudge.Bot() {
+		return rand.Intn(len(b.PlayedCards.pp)), nil
+	}
+	if currentJudge.Host() && !currentJudge.Bot() {
+		return view.JudgeCards(greenApple, redApples), nil
+	}
+	if !currentJudge.Host() && !currentJudge.Bot() {
+		/*
+		TODO: implement network call.
+		*/
+		return -1, errors.New("online play not implemented")
+	}
+	
+	return -1, errors.New("unexpected judge status")
 }

@@ -198,3 +198,29 @@ func TestIncreaseScore(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestShowHand(t *testing.T) {
+	testDeck, deckErr := generateTestDeckRA()
+	if deckErr != nil {
+		t.Log(deckErr)
+		t.FailNow()
+	}
+	player := model.NewPlayer("player one", true, false, 7)
+	player.DrawCard(&testDeck)
+	hand := player.ShowHand()
+	var expectedHand []string = []string{
+		"[A Bad Haircut] - The perfect start to a bad hair day.",
+		"[A Bakery] - Some bakers start work at 3:00 in the morning, so breads and donuts are fresh for  breakfast.",
+		"[A Broken Leg] - I was riding my bike when I hit this big rock . . .",
+		"[A Bull Fight] - Also known as \"la fiesta brava\" (the brave festival).  A whole lot of bull..",
+		"[A Cabin In The Woods] - Henry David Thoreau went to Walden Pond for two years.  All we're asking for is one lousy weekend!",
+		"[A Can Of Worms] - Now you've opened it.",
+		"[A Car Crash] - \"Hey, it was an accident!\"",
+	}
+	for i := 0; i < len(hand); i++ {
+		if hand[i] != expectedHand[i] {
+			t.Log("expected: ", expectedHand[i], "\nreceived: ", hand[i])
+			t.FailNow()
+		}
+	}
+}

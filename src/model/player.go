@@ -112,6 +112,15 @@ func (p *Player) PlayerHand() []Card {
 	return p.hand
 }
 
+func (p *Player) ShowHand() []string {
+	hand := p.hand
+	var dispHand []string
+	for i := 0; i < len(hand); i++ {
+		dispHand = append(dispHand, hand[i].DisplayCard())
+	}
+	return dispHand
+}
+
 func (p *Player) CardsInHand() int {
 	return len(p.hand)
 }

@@ -147,7 +147,7 @@ func TestDiscardRound(t *testing.T) {
 		t.FailNow()
 	}
 	pa := generateTestPA(&testDeck)
-	disErr := pa.DiscardRound(&testDeck)
+	_, disErr := pa.DiscardRound(&testDeck)
 	if disErr != nil {
 		t.Log(disErr)
 		t.FailNow()
