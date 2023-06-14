@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-func generateTestDeck() (model.Deck, error) {
-	absPath, pathErr := filepath.Abs("../resources/testSet.txt")
+func generateTestDeckGA() (model.Deck, error) {
+	absPath, pathErr := filepath.Abs("../resources/testSetGA.txt")
 	if pathErr != nil {
 		return *new(model.Deck), errors.New("test incorrectly configured, invalid resource path")
 	}
@@ -20,8 +20,20 @@ func generateTestDeck() (model.Deck, error) {
 	return testDeck, nil
 }
 
+func generateTestDeckRA() (model.Deck, error) {
+	absPath, pathErr := filepath.Abs("../resources/testSetRA.txt")
+	if pathErr != nil {
+		return *new(model.Deck), errors.New("test incorrectly configured, invalid resource path")
+	}
+	testDeck, deckErr := model.GenerateDeck(absPath, "red apple")
+	if deckErr != nil {
+		return *new(model.Deck), deckErr
+	}
+	return testDeck, nil
+}
+
 func TestGeneratePile(t *testing.T) {
-	testDeck, deckGenErr := generateTestDeck()
+	testDeck, deckGenErr := generateTestDeckGA()
 	if deckGenErr != nil {
 		t.Log(deckGenErr)
 		t.Fail()
@@ -49,7 +61,7 @@ func TestEmptyDeckDraw(t *testing.T) {
 }
 
 func TestDiscardCardValid(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.Fail()
@@ -70,7 +82,7 @@ func TestDiscardCardValid(t *testing.T) {
 	}
 }
 func TestDiscardCardInvalid(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.Fail()
@@ -96,8 +108,8 @@ func TestShuffle(t *testing.T) {
 	var coincidense int = 0
 	var repeatFor int = 10_000
 	for n := 0; n < repeatFor; n++ {
-		testDeck, deckGenErr := generateTestDeck()
-		initialDeck, _ := generateTestDeck()
+		testDeck, deckGenErr := generateTestDeckGA()
+		initialDeck, _ := generateTestDeckGA()
 		if deckGenErr != nil {
 			t.Log(deckGenErr)
 			t.Fail()
@@ -127,7 +139,7 @@ func TestShuffle(t *testing.T) {
 }
 
 func TestCombineShuffle(t *testing.T) {
-	testDeck, _ := generateTestDeck()
+	testDeck, _ := generateTestDeckGA()
 	for testDeck.CardsLeft() > 0  {
 		card, err := testDeck.DrawCard()
 		if err != nil {

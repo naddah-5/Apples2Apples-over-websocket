@@ -2,6 +2,7 @@ package model_test
 
 import (
 	"main/model"
+	"path/filepath"
 	"testing"
 )
 
@@ -198,7 +199,7 @@ func TestWinCheck(t *testing.T) {
 	board.AddPlayer(playerFour)
 	board.SetWinCondition()
 
-	testDeck, testErr := generateTestDeck()
+	testDeck, testErr := generateTestDeckGA()
 	if testErr != nil {
 		t.Log("incorrectly configured test, generate deck error detected", testErr)
 		t.FailNow()
@@ -211,7 +212,7 @@ func TestWinCheck(t *testing.T) {
 		board.AwardScore(playerOne.PlayerName(), scoreCard)
 	}
 
-	winConditionMet, winErr := board.Winner()
+	winConditionMet, winErr := board.GameWinner()
 	if winErr != nil {
 		t.Log("unexpected error: ", winErr)
 		t.FailNow()
@@ -229,13 +230,13 @@ func TestWinCheck(t *testing.T) {
 		board.AwardScore(playerTwo.PlayerName(), scoreCard)
 	}
 
-	winConditionMet2, _ := board.Winner()
+	winConditionMet2, _ := board.GameWinner()
 	if !winConditionMet2 {
 		t.Log("expected to have a winner")
 		t.FailNow()
 	}
 
-	winner, winConErr := board.WhoWon()
+	winner, winConErr := board.WhoWonGame()
 	if winConErr != nil {
 		t.Log("unexpected error:", winConErr)
 		t.FailNow()
@@ -269,7 +270,7 @@ func TestWinConditionMorePlayers(t *testing.T) {
 	board.AddPlayer(playerSeven)
 	board.SetWinCondition()
 
-	testDeck, testErr := generateTestDeck()
+	testDeck, testErr := generateTestDeckGA()
 	if testErr != nil {
 		t.Log("incorrectly configured test, generate deck error detected", testErr)
 		t.FailNow()
@@ -282,7 +283,7 @@ func TestWinConditionMorePlayers(t *testing.T) {
 		}
 		board.AwardScore(playerThree.PlayerName(), scoreCard)
 	}
-	winConditionMet, winErr := board.Winner()
+	winConditionMet, winErr := board.GameWinner()
 	if winErr != nil {
 		t.Log("unexpected error: ", winErr)
 		t.FailNow()
@@ -291,7 +292,7 @@ func TestWinConditionMorePlayers(t *testing.T) {
 		t.Log("expected win condition")
 		t.FailNow()
 	}
-	winner, winPlayErr := board.WhoWon()
+	winner, winPlayErr := board.WhoWonGame()
 	if winPlayErr != nil {
 		t.Log("expected a winner, received error:", winPlayErr)
 		t.FailNow()
@@ -299,6 +300,85 @@ func TestWinConditionMorePlayers(t *testing.T) {
 	winnerName := winner.PlayerName()
 	if winnerName != "player three" {
 		t.Log("unexpected winner, expected player three to win, actually ", winnerName)
+		t.FailNow()
+	}
+}
+
+func TestFillHands(t * testing.T) {
+	playerOne := *model.NewPlayer("player one", false, true, 7)
+	playerTwo := *model.NewPlayer("player two", false, true, 7)
+	playerThree := *model.NewPlayer("player three", false, true, 7)
+	playerFour := *model.NewPlayer("player four", false, true, 7)
+	
+	var board model.Board = *new(model.Board)
+
+	board.AddPlayer(playerOne)
+	board.AddPlayer(playerTwo)
+	board.AddPlayer(playerThree)
+	board.AddPlayer(playerFour)
+	board.SetWinCondition()
+
+	absPath, pathErr := filepath.Abs("../resources/testSetRA.txt")
+	if pathErr != nil {
+		t.Log("test incorrectly configured, invalid resource path")
+		t.FailNow()
+	}
+	loadErr := board.LoadRedApples(absPath)
+	if loadErr != nil {
+		t.Log("test incorrectly configured, ", loadErr.Error())
+	}
+	fillErr := board.FillHands()
+	if fillErr != nil {
+		t.Log("could not draw cards, ", fillErr.Error())
+		t.FailNow()
+	}
+	if !board.AllHandsFull() {
+		t.Log("did not propperly fill player hands")
+		t.FailNow()
+	}
+}
+
+func TestChooseCard(t *testing.T) {
+	playerOne := *model.NewPlayer("player one", false, true, 7)
+	playerTwo := *model.NewPlayer("player two", false, true, 7)
+	playerThree := *model.NewPlayer("player three", false, true, 7)
+	playerFour := *model.NewPlayer("player four", false, true, 7)
+	
+	var board model.Board = *new(model.Board)
+
+	board.AddPlayer(playerOne)
+	board.AddPlayer(playerTwo)
+	board.AddPlayer(playerThree)
+	board.AddPlayer(playerFour)
+	board.SetWinCondition()
+
+	absPath, pathErr := filepath.Abs("../resources/testSetRA.txt")
+	if pathErr != nil {
+		t.Log("test incorrectly configured, invalid resource path")
+		t.FailNow()
+	}
+	loadErr := board.LoadRedApples(absPath)
+	if loadErr != nil {
+		t.Log("test incorrectly configured, ", loadErr.Error())
+	}
+	fillErr := board.FillHands()
+	if fillErr != nil {
+		t.Log("could not draw cards, ", fillErr.Error())
+		t.FailNow()
+	}
+
+	pa, err := board.ChooseCards()
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+	playedCards, pErr := pa.DisplayApples()
+	if pErr != nil {
+		t.Log(pErr)
+		t.FailNow()
+	}
+	if len(playedCards) != 3 {
+		t.Log("did not receive the expected number of apples, received", len(playedCards), "expected 3")
 		t.FailNow()
 	}
 }

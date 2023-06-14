@@ -30,7 +30,7 @@ func generateTestPA(testDeck *model.Deck) model.PlayedApples {
 Statistical test for the player shuffling.
 */
 func TestPAShuffle(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log("incorrect test config,", deckErr)
 	}
@@ -54,7 +54,7 @@ func TestPAShuffle(t *testing.T) {
 }
 
 func TestDisplayApple(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log("incorrect test config,", deckErr)
 		t.FailNow()
@@ -80,7 +80,7 @@ func TestDisplayApple(t *testing.T) {
 }
 
 func TestShowPlayers(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log("incorrect test config,", deckErr)
 		t.FailNow()
@@ -122,7 +122,7 @@ func TestShowPlayers(t *testing.T) {
 }
 
 func TestShowPlayerInvalid(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log("incorrect test config,", deckErr)
 		t.FailNow()
@@ -141,7 +141,7 @@ func TestShowPlayerInvalid(t *testing.T) {
 }
 
 func TestDiscardRound(t *testing.T) {
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log("incorrect test config,", deckErr)
 		t.FailNow()

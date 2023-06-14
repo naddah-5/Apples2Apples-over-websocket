@@ -67,3 +67,8 @@ func clear() error {
 	}
 	return errors.New("Unsupported OS")
 }
+
+
+func ChooseCard() int {
+	return 0
+}

@@ -10,7 +10,7 @@ type PlayedApples struct {
 }
 
 type PlayerPlayed struct{
-	players *Player
+	player *Player
 	card Card
 }
 
@@ -35,6 +35,14 @@ func PlayedRound(pp []PlayerPlayed) PlayedApples {
 
 func (pa *PlayedApples) PlayerCount() int {
 	return len(pa.pp)
+}
+
+func (pa *PlayedApples) SubmitCard(player *Player, card Card) {
+	submission := PlayerPlayed{
+		player: player,
+		card: card,
+	}
+	pa.pp = append(pa.pp, submission)
 }
 
 
@@ -82,7 +90,7 @@ func (pa *PlayedApples) ShowPlayer(index int) (string, error) {
 	if index < 0 || index >= len(pa.pp) {
 		return "", errors.New("index out of bounds")
 	}
-	return pa.pp[index].players.PlayerName(), nil
+	return pa.pp[index].player.PlayerName(), nil
 }
 
 /*

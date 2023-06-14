@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"main/network"
 	"math/rand"
+
+	"main/view"
 )
 
 type Board struct {
 	network network.Network
 	players []Player
 	judge int
+	currentGreenApple Card
 	redApples Deck
 	greenApples Deck
 	playedCards []PlayedApples
@@ -45,6 +48,10 @@ func (b *Board) validateName(name string) bool {
 	return true
 }
 
+func (b *Board) CountPlayers() int {
+	return len(b.players)
+}
+
 /*
 Returns a pointer to the player matching the player name.
 
@@ -57,6 +64,24 @@ func (b *Board) findPlayer(playerName string) (*Player, error) {
 		}
 	}
 	return new(Player), errors.New("player not found")
+}
+
+
+func (b *Board) PlayersHand(playerName string) ([]Card, error) {
+	player, findErr := b.findPlayer(playerName)
+	if findErr != nil {
+		return *new([]Card), findErr
+	}
+	return player.PlayerHand(), nil
+}
+
+func (b *Board) AllHandsFull() bool {
+	for i := 0; i < b.CountPlayers(); i++ {
+		if len(b.players[i].hand) < b.players[i].handCapacity {
+			return false
+		}
+	}
+	return true
 }
 
 /*
@@ -96,12 +121,12 @@ func (b *Board) ShufflePlayers() error {
 /*
 Returns current judge index.
 */
-func (b *Board) CurrentJudgeIndex() int {
+func (b *Board) currentJudgeIndex() int {
 	return b.judge
 }
 
 func (b *Board) CurrentJudgeName() string {
-	return b.players[b.CurrentJudgeIndex()].PlayerName()
+	return b.players[b.currentJudgeIndex()].PlayerName()
 }
 
 /*
@@ -158,6 +183,41 @@ func (b *Board) LoadGreenApples(source string) error {
 }
 
 /*
+Draws a green apple and places it on the board.
+
+Returns an error if a green apple can not be drawn.
+*/
+func (b *Board) DrawGreenApple() error {
+	card, err := b.greenApples.DrawCard()
+	if err != nil {
+		return err
+	}
+	b.currentGreenApple = card
+	return nil
+}
+
+/*
+Returns the string representation of the current green apple on the board.
+*/
+func (b *Board) CurrentGreenApple() string {
+	return b.currentGreenApple.DisplayCard()
+}
+
+/*
+Retrieve the current green apple from the board.
+
+Returns an error if there is no green apple on the board.
+*/
+func (b *Board) PickUpGreenApple() (Card, error) {
+	card := b.currentGreenApple
+	if card == (Card{}) {
+		return card, errors.New("no green apple on board")
+	}
+	b.currentGreenApple = *new(Card)
+	return card, nil
+}
+
+/*
 Define the win condition 
 */
 func (b *Board) SetWinCondition() error {
@@ -189,7 +249,7 @@ Check if any player satisfy the win condition.
 
 Returns an error if the win condition is not set correctly.
 */
-func (b *Board) Winner() (bool, error) {
+func (b *Board) GameWinner() (bool, error) {
 	if b.winCondition <= 0 {
 		return false, errors.New("invalid win condition")
 	}
@@ -206,11 +266,66 @@ Returns a player that satisfy the win condition.
 
 Returns an error if there is no player satisfying the win condition.
 */
-func (b *Board) WhoWon() (Player, error) {
+func (b *Board) WhoWonGame() (Player, error) {
 	for i := 0; i < len(b.players); i++ {
 		if b.players[i].Score() >= b.winCondition {
 			return b.players[i], nil
 		}
 	}
 	return *new(Player), errors.New("there is no winner")
+}
+
+/*
+Goes through all players and retrieves which card they want to play. Returns the 
+PlayedApples struct containing all played cards.
+
+Returns an error if a player tries to play an invalid card index.
+*/
+func (b *Board) ChooseCards() (PlayedApples, error) {
+	pa := new(PlayedApples)
+	currentJudge := b.CurrentJudgeName()
+	for i := 0; i < len(b.players); i++ {
+		if b.players[i].PlayerName() == currentJudge {
+			// skips the host
+			continue
+		}
+		if b.players[i].Bot() {
+			var randomCardIndex int = rand.Intn(b.players[i].CardsInHand())
+			card, cardErr := b.players[i].PlayCard(randomCardIndex)
+			if cardErr != nil {
+				return *pa, errors.New("bot tried to play invalid card, " + cardErr.Error())
+			}
+			pa.SubmitCard(&b.players[i], card)
+		}
+		if b.players[i].Host() {
+			cardIndex := view.ChooseCard()
+			card, playerCardErr := b.players[i].PlayCard(cardIndex)
+			if playerCardErr != nil {
+				return *pa, errors.New("host tried to play invalid card, " + playerCardErr.Error())
+			}
+			pa.SubmitCard(&b.players[i], card)
+		}
+		if !b.players[i].Host() && !b.players[i].Bot() {
+			/*
+			TODO: Add online call here!
+			*/
+		}
+	}
+	return *pa, nil
+}
+
+/*
+Goes through all players and perferms the DrawCard(redApples) method on them, 
+this will cause them to fill their hands to capacity with red apples.
+
+Returns an error if a player is unable to draw cards from the deck.
+*/
+func (b *Board) FillHands() error {
+	for i := 0; i < len(b.players); i++ {
+		drawErr := b.players[i].DrawCard(&b.redApples)
+		if drawErr != nil {
+			return drawErr
+		}
+	}
+	return nil
 }

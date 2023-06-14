@@ -40,7 +40,7 @@ func TestGeneratePlayerAndGetters(t *testing.T) {
 
 func TestPlayerDrawCard(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
@@ -72,7 +72,7 @@ func TestDrawCardError(t *testing.T) {
 
 func TestPlayerDrawCardCombineShuffle(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
@@ -101,7 +101,7 @@ func TestPlayerDrawCardCombineShuffle(t *testing.T) {
 
 func TestPlayCardZero(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
@@ -124,7 +124,7 @@ func TestPlayCardZero(t *testing.T) {
 
 func TestPlayCardLast(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
@@ -147,7 +147,7 @@ func TestPlayCardLast(t *testing.T) {
 
 func TestPlayCardCenter(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
@@ -170,7 +170,7 @@ func TestPlayCardCenter(t *testing.T) {
 
 func TestPlayCardInvalid(t *testing.T) {
 	player := generateTestPlayer()
-	testDeck, deckErr := generateTestDeck()
+	testDeck, deckErr := generateTestDeckGA()
 	if deckErr != nil {
 		t.Log(deckErr)
 		t.FailNow()
