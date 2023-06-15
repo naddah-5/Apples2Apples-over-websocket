@@ -1,7 +1,9 @@
 package main
 
-import "main/view"
+import (
+	"main/controller"
+)
 
 func main() {
-	view.Greeting()
+	controller.Game()
 }

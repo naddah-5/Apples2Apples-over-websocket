@@ -67,10 +67,10 @@ func TestDisplayApple(t *testing.T) {
 		t.FailNow()
 	}
 
-	expected := []string{	"[Absurd] - ridiculous, senseless, foolish", 
-				"[Abundant] - plentiful, ample, numerous",
-				"[Addictive] - obsessive, consuming, captivating",
-				"[Adorable] - lovable, charming, delightful"}
+	expected := []string{	"[Absurd] - (ridiculous, senseless, foolish)", 
+				"[Abundant] - (plentiful, ample, numerous)",
+				"[Addictive] - (obsessive, consuming, captivating)",
+				"[Adorable] - (lovable, charming, delightful)"}
 	for i := 0; i < len(printList); i++ {
 		if printList[i] != expected[i] {
 			t.Log("expected,", expected[i], "received,", printList[i])

@@ -112,7 +112,7 @@ func TestPlayCardZero(t *testing.T) {
 		t.Log(playErr)
 		t.FailNow()
 	}
-	if playedCard.DisplayCard() != "[Absurd] - ridiculous, senseless, foolish" {
+	if playedCard.DisplayCard() != "[Absurd] - (ridiculous, senseless, foolish)" {
 		t.Log("unexpected card:", playedCard.DisplayCard())
 		t.FailNow()
 	}
@@ -135,7 +135,7 @@ func TestPlayCardLast(t *testing.T) {
 		t.Log(playErr)
 		t.FailNow()
 	}
-	if playedCard.DisplayCard() != "[Amazing] - astonishing, surprising, wonderful" {
+	if playedCard.DisplayCard() != "[Amazing] - (astonishing, surprising, wonderful)" {
 		t.Log("unexpected card:", playedCard.DisplayCard())
 		t.FailNow()
 	}
@@ -158,7 +158,7 @@ func TestPlayCardCenter(t *testing.T) {
 		t.Log(playErr)
 		t.FailNow()
 	}
-	if playedCard.DisplayCard() != "[Adorable] - lovable, charming, delightful" {
+	if playedCard.DisplayCard() != "[Adorable] - (lovable, charming, delightful)" {
 		t.Log("unexpected card:", playedCard.DisplayCard())
 		t.FailNow()
 	}

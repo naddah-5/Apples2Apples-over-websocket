@@ -31,8 +31,8 @@ func GenerateDeck(source string, deckType string) (Deck, error) {
 	deck := createDeck(deckType)
 	
 	for scanner.Scan() { 
-		cardData := strings.Split(scanner.Text(), " - ")
-		formatDescription((&cardData[1])) // Remove parenthesis from description using a in-place function.
+		cardData := strings.SplitAfterN(scanner.Text(), "]", 2)
+		cardData[1] = strings.Trim(cardData[1], " - ")
 
 		newCard := MintCard(deckType, cardData[0], cardData[1])
 		deck.deck = append(deck.deck, newCard)
@@ -49,14 +49,6 @@ func createDeck(deckType string) Deck {
 	return newDeck
 }
 
-/*
-Removes the surrounding parenthesis from the description.
-*/
-func formatDescription(card *string) {
-	*card = strings.TrimSpace(*card)
-	*card = strings.Trim(*card, "(")
-	*card = strings.Trim(*card, ")")
-}
 
 /*
 Returns how many cards are left in the shuffled deck as an int.

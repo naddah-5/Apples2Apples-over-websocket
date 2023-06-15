@@ -38,7 +38,7 @@ func TestGeneratePile(t *testing.T) {
 		t.Log(deckGenErr)
 		t.Fail()
 	}
-	var expectedCard string = "[Absurd] - ridiculous, senseless, foolish"
+	var expectedCard string = "[Absurd] - (ridiculous, senseless, foolish)"
 	card, emptyDeckErr := testDeck.DrawCard()
 	if emptyDeckErr != nil {
 		t.Log(emptyDeckErr)

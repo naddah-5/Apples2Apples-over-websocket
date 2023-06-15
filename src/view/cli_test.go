@@ -5,5 +5,5 @@ import (
 )
 
 func TestGreeting(t *testing.T) {
-	// view.Greeting()
+	//view.Greeting()
 }

@@ -125,6 +125,14 @@ func (b *Board) currentJudgeIndex() int {
 	return b.judge
 }
 
+func (b *Board) InitializeJudge() error {
+	if b.CountPlayers() <= 0 {
+		return errors.New("can not shuffle zero players")
+	}
+	b.judge = rand.Intn(b.CountPlayers())
+	return nil
+}
+
 func (b *Board) CurrentJudgeName() string {
 	return b.players[b.currentJudgeIndex()].PlayerName()
 }
@@ -132,12 +140,11 @@ func (b *Board) CurrentJudgeName() string {
 /*
 Itterates to a new judge and return the new judge index.
 */
-func (b *Board) ItterateJudge() int {
+func (b *Board) ItterateJudge() {
 	b.judge++
 	if b.judge >= len(b.players) {
 		b.judge = 0
 	}
-	return b.judge
 }
 
 /*
@@ -168,6 +175,10 @@ func (b *Board) LoadRedApples(source string) error {
 	return nil
 }
 
+func (b *Board) ShuffleRedApples() error {
+	return b.redApples.ShuffleDeck()
+}
+
 /*
 Loads a deck of green apples from a resource file.
 
@@ -180,6 +191,10 @@ func (b *Board) LoadGreenApples(source string) error {
 	}
 	b.greenApples = greenAppleDeck
 	return nil
+}
+
+func (b *Board) ShuffleGreenApples() error {
+	return b.greenApples.ShuffleDeck()
 }
 
 /*
@@ -276,8 +291,7 @@ func (b *Board) WhoWonGame() (Player, error) {
 }
 
 /*
-Goes through all players and retrieves which card they want to play. Returns the 
-PlayedApples struct containing all played cards.
+Goes through all players and retrieves which card they want to play. 
 
 Returns an error if a player plays an invalid card index, this should cause a panic.
 Meaning that this method should not be used to validate user input.
@@ -289,6 +303,7 @@ func (b *Board) ChooseCards() error {
 	for i := 0; i < len(b.players); i++ {
 		if b.players[i].PlayerName() == currentJudge {
 			// skips the judge
+			view.WaitPlayerCards()
 			continue
 		}
 		if b.players[i].Bot() {
@@ -315,6 +330,7 @@ func (b *Board) ChooseCards() error {
 		}
 	}
 	b.PlayedCards = *pa
+	b.PlayedCards.Shuffle()
 	return nil
 }
 
@@ -350,6 +366,7 @@ func (b *Board) Judge() (int, error) {
 	}
 	
 	if currentJudge.Bot() {
+		view.DisplaySubmissions(greenApple, redApples)
 		return rand.Intn(len(b.PlayedCards.pp)), nil
 	}
 	if currentJudge.Host() && !currentJudge.Bot() {
@@ -363,4 +380,13 @@ func (b *Board) Judge() (int, error) {
 	}
 	
 	return -1, errors.New("unexpected judge status")
+}
+
+
+func (b *Board) DiscardRound() error {
+	_, discErr := b.PlayedCards.DiscardRound(&b.redApples)
+	if discErr != nil {
+		return discErr
+	}
+	return nil
 }
