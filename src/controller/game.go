@@ -162,7 +162,10 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 		} else {
 			scoreBoard := board.DisplayScoreBoard()
 			view.ScoreBoard(scoreBoard)
-			playRound(terminal, board)
+			roundErr := playRound(terminal, board)
+			if roundErr != nil {
+				panic(roundErr)
+			}
 		}
 	}
 }
