@@ -198,9 +198,20 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 	*/
 	board := new(model.Board)
 	board.AddPlayer(*model.NewPlayer(playerName, true, false, 7))
-	board.AddPlayer(*model.NewPlayer("Bot1", false, true, 7))
-	board.AddPlayer(*model.NewPlayer("Bot2", false, true, 7))
-	board.AddPlayer(*model.NewPlayer("Bot3", false, true, 7))
+
+
+
+	/*
+	TODO: Initialize players....
+	*/
+
+
+
+
+
+
+
+
 
 	/*
 	Load the card decks and add them to the board.
