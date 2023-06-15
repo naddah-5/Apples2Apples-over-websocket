@@ -89,10 +89,11 @@ Returns the string representation of players and their score.
 */
 func (b *Board) DisplayScoreBoard() []string {
 	var playerScores []string
+	playerScores = append(playerScores, "Player name\t\tScore")
 	for i := 0; i < len(b.players); i++ {
 		playerName := b.players[i].PlayerName()
 		playerScore := b.players[i].Score()
-		playerScores = append(playerScores, playerName + ": \t" + fmt.Sprint(playerScore))
+		playerScores = append(playerScores, playerName + ": \t\t\t" + fmt.Sprint(playerScore))
 	}
 	return playerScores
 }

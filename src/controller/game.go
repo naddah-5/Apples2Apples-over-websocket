@@ -40,8 +40,8 @@ func setupSinglePlayer(terminal bufio.Scanner) *model.Board {
 	var playerName string
 	terminal.Scan()
 	playerName = terminal.Text()
-	fmt.Println("You choose ", playerName)
-	fmt.Println("1) confirm\n Otherwise) choose another name")
+	fmt.Println("You entered", playerName)
+	fmt.Println("1) confirm name\n not 1) back")
 	terminal.Scan() 
 	var confirmation string = terminal.Text()
 	if confirmation != "1" {
@@ -160,6 +160,8 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 			}
 			view.Winner(winner.PlayerName())
 		} else {
+			scoreBoard := board.DisplayScoreBoard()
+			view.ScoreBoard(scoreBoard)
 			playRound(terminal, board)
 		}
 	}
@@ -201,7 +203,7 @@ func playRound(terminal bufio.Scanner, board *model.Board) error {
 		fmt.Println("tried to find player using invalid index ", indexErr)
 		return indexErr
 	}
-	fmt.Println(winner, " won the round")
+	fmt.Println(winner, "won the round")
 
 	greenApple, pickErr := board.PickUpGreenApple()
 	if pickErr != nil {

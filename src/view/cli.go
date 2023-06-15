@@ -2,11 +2,8 @@ package view
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
-	"os/exec"
-	"runtime"
 	"strconv"
 )
 
@@ -14,18 +11,23 @@ import (
 Attempt to clear the terminal screen, if the OS is unsupported returns an error.
 */
 func clear() error {
-	if runtime.GOOS == "linux" {
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-		return nil
-	} else if runtime.GOOS == "windows" {
-		cmd := exec.Command("cmd", "/c", "cls")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-		return nil
+	for i := 0; i < 1; i++ {
+		fmt.Println()
 	}
-	return errors.New("Unsupported OS")
+	return nil
+	
+	// if runtime.GOOS == "linux" {
+	// 	cmd := exec.Command("clear")
+	// 	cmd.Stdout = os.Stdout
+	// 	cmd.Run()
+	// 	return nil
+	// } else if runtime.GOOS == "windows" {
+	// 	cmd := exec.Command("cmd", "/c", "cls")
+	// 	cmd.Stdout = os.Stdout
+	// 	cmd.Run()
+	// 	return nil
+	// }
+	// return errors.New("Unsupported OS")
 }
 
 func Terminal() bufio.Scanner {
@@ -56,7 +58,7 @@ Prompt user to choose a player name.
 */
 func ChooseName() {
 	clear()
-	fmt.Println("Please choose a player name: ")
+	fmt.Println("Please enter player name:")
 }
 
 /*
@@ -64,7 +66,7 @@ Print out the players hand and current green apple, take which card to play from
 */
 func ChooseCard(greenApple string, hand []string) int {
 	clear()
-	fmt.Println("The current green apple is ", greenApple)
+	fmt.Println("The current green apple is", greenApple)
 	fmt.Println("Please select a card to play:")
 	for i := 0; i < len(hand); i++ {
 		fmt.Println("[", i, "]: ", hand[i])
@@ -94,7 +96,7 @@ form of an index int.
 */
 func JudgeCards(greenApple string, redApples []string) int {
 	clear()
-	fmt.Println("Current green apple ", greenApple)
+	fmt.Println("Current green apple", greenApple)
 	fmt.Println("Submitted red apples")
 	for i := 0; i < len(redApples); i++ {
 		fmt.Println("[", i, "]", redApples[i])
@@ -106,12 +108,12 @@ func JudgeCards(greenApple string, redApples []string) int {
 		input := terminal.Text()
 		parseChoice, convErr := strconv.ParseInt(input, 10, 64)
 		if convErr != nil {
-			fmt.Println("Please only enter the integer representation of your choice.")
+			fmt.Println("Please enter a valid option.")
 			continue
 		}
 		choice = int(parseChoice)
 		if choice < 0 || choice >= len(redApples) {
-			fmt.Println("Please choose a valid option")
+			fmt.Println("Please select a valid option")
 		} else {
 			break
 		}
@@ -122,7 +124,7 @@ func JudgeCards(greenApple string, redApples []string) int {
 
 func DisplaySubmissions(greenApple string, redApples []string) {
 	clear()
-	fmt.Println("Current green apple ", greenApple)
+	fmt.Println("Current green apple", greenApple)
 	fmt.Println("Submitted red apples")
 	for i := 0; i < len(redApples); i++ {
 		fmt.Println(redApples[i])
@@ -131,6 +133,13 @@ func DisplaySubmissions(greenApple string, redApples []string) {
 }
 
 func Winner(name string) {
-	fmt.Println(name, " has won the game, congratulation!")
+	fmt.Println(name, "has won the game, congratulation!")
 	os.Exit(0)
+}
+
+func ScoreBoard(score []string) {
+	clear()
+	for i := 0; i < len(score); i++ {
+		fmt.Println(score[i])
+	}
 }
