@@ -3,14 +3,13 @@ package model
 import (
 	"errors"
 	"fmt"
-	"main/network"
 	"math/rand"
 
 	"main/view"
 )
 
 type Board struct {
-	network network.Network
+	network Network
 	players []Player
 	judge int
 	currentGreenApple Card

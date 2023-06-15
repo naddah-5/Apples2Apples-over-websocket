@@ -1,8 +1,6 @@
 package main
 
-import (
-	"main/controller"
-)
+import "main/controller"
 
 func main() {
 	controller.Game()
