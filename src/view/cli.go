@@ -71,6 +71,7 @@ func ChooseCard(greenApple string, hand []string) int {
 	for i := 0; i < len(hand); i++ {
 		fmt.Println("[", i, "]: ", hand[i])
 	}
+	fmt.Println("Select card by submitting its index:")
 	terminal := Terminal()
 	for terminal.Scan() {
 		input := terminal.Text()
@@ -101,6 +102,7 @@ func JudgeCards(greenApple string, redApples []string) int {
 	for i := 0; i < len(redApples); i++ {
 		fmt.Println("[", i, "]", redApples[i])
 	}
+	fmt.Println("Select winning card by submitting its index:")
 
 	terminal := Terminal()
 	var choice int
