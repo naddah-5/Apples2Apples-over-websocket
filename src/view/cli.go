@@ -136,7 +136,6 @@ func DisplaySubmissions(greenApple string, redApples []string) {
 
 func Winner(name string) {
 	fmt.Println(name, "has won the game, congratulation!")
-	os.Exit(0)
 }
 
 func ScoreBoard(score []string) {

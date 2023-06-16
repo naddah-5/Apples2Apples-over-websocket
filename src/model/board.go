@@ -65,7 +65,11 @@ func (b *Board) findPlayer(playerName string) (*Player, error) {
 	return new(Player), errors.New("player not found")
 }
 
+/*
+Returns a specific players hand.
 
+Returns an error if the player can not be found.
+*/
 func (b *Board) PlayersHand(playerName string) ([]Card, error) {
 	player, findErr := b.findPlayer(playerName)
 	if findErr != nil {
@@ -74,6 +78,9 @@ func (b *Board) PlayersHand(playerName string) ([]Card, error) {
 	return player.PlayerHand(), nil
 }
 
+/*
+Returns false if any player does not have a full hand, otherwise returns true.
+*/
 func (b *Board) AllHandsFull() bool {
 	for i := 0; i < b.CountPlayers(); i++ {
 		if len(b.players[i].hand) < b.players[i].handCapacity {
@@ -125,14 +132,22 @@ func (b *Board) currentJudgeIndex() int {
 	return b.judge
 }
 
+/*
+Set the judge index to a random player index.
+
+Returns an error if there are no players.
+*/
 func (b *Board) InitializeJudge() error {
 	if b.CountPlayers() <= 0 {
-		return errors.New("can not shuffle zero players")
+		return errors.New("no players on board")
 	}
 	b.judge = rand.Intn(b.CountPlayers())
 	return nil
 }
 
+/*
+Returns the current judges name.
+*/
 func (b *Board) CurrentJudgeName() string {
 	return b.players[b.currentJudgeIndex()].PlayerName()
 }

@@ -56,9 +56,9 @@ func setupOfflineGame(terminal bufio.Scanner) *model.Board {
 	*/
 	board := new(model.Board)
 	board.AddPlayer(*model.NewPlayer(playerName, true, false, 7))
-	board.AddPlayer(*model.NewPlayer("Bot1", false, true, 7))
-	board.AddPlayer(*model.NewPlayer("Bot2", false, true, 7))
-	board.AddPlayer(*model.NewPlayer("Bot3", false, true, 7))
+	for i := 0; i < 3; i++ {
+		board.AddPlayer(*model.NewPlayer("Bot"+fmt.Sprint(i), false, true, 7))
+	}
 
 	/*
 	Load the card decks and add them to the board.
@@ -178,8 +178,10 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 		terminal.Scan()
 		onlinePlayers, parseErr = strconv.ParseInt(terminal.Text(), 10, 64)
 	}
+	
 	network := new(model.Network)
 	go network.Listener()
+	
 	fmt.Println("Waiting for players to connect to loaclhost, port 8080...")
 	for {
 		time.Sleep(1 * time.Second)
@@ -199,19 +201,21 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 	board := new(model.Board)
 	board.AddPlayer(*model.NewPlayer(playerName, true, false, 7))
 
+	onlinePlayerNames := network.ListPlayers()
+	for i := 0; i < int(onlinePlayers); i++ {
+		board.AddPlayer(*model.NewPlayer(onlinePlayerNames[i], false, false, 7))
+	}
 
+	humanPlayers := board.CountPlayers()
+	for i := 0; i + humanPlayers < 4; i++ {
+		board.AddPlayer(*model.NewPlayer("Bot"+fmt.Sprint(i), false, true, 7))
+	}
 
 	/*
-	TODO: Initialize players....
+	Add network component to board.
+	=======================================================================
 	*/
-
-
-
-
-
-
-
-
+	board.network = network
 
 	/*
 	Load the card decks and add them to the board.
@@ -318,6 +322,7 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 				panic(falseWin)
 			}
 			view.Winner(winner.PlayerName())
+			os.Exit(0)
 		} else {
 			/*
 			Start a new round.

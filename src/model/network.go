@@ -75,6 +75,7 @@ func (n *Network) Play(playerName string, prompt string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	prompt = "Play\n" + prompt
 	conn := n.players[playerIndex].conn
 	_, sendErr := conn.Write([]byte(prompt))
 	if sendErr != nil {
@@ -102,6 +103,7 @@ func (n *Network) Display(playerName string, info string) error {
 	if err != nil {
 		return err
 	}
+	info = "Display\n" + info
 	conn := n.players[playerIndex].conn
 	_, sendErr := conn.Write([]byte(info))
 	if sendErr != nil {
@@ -117,4 +119,23 @@ func (n  *Network) findPlayer(name string) (int, error) {
 		}
 	}
 	return -1, errors.New("did not find online player by name")
+}
+
+func (n *Network) findPlayerName(index int) (string, error) {
+	if index < 0 || index >= n.CountOnlinePlayers() {
+		return "", errors.New("index out of bounds")
+	}
+	return n.players[index].playerName, nil
+}
+
+func (n *Network) ListPlayers() []string {
+	var playerList []string
+	for i := 0; i < n.CountOnlinePlayers(); i++ {
+		name, err := n.findPlayerName(i)
+		if err != nil {
+			continue
+		}
+		playerList = append(playerList, name)
+	}
+	return playerList
 }
