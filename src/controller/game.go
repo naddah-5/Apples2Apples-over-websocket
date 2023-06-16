@@ -18,12 +18,13 @@ func Game() {
 		input := terminal.Text()
 		switch input {
 		case "1":
-			fmt.Println("Online play is not yet implemented")
-		case "2":
-			fmt.Println("Online play is not yet implemented")
-		case "3":
 			board := setupOfflineGame(terminal)
 			playGame(terminal, board)
+		case "2":
+			board := setupOnlineGame(terminal)
+			playGame(terminal, board)
+		case "3":
+			joinGame(terminal)
 		case "4":
 			os.Exit(0)
 		default:
@@ -215,7 +216,7 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 	Add network component to board.
 	=======================================================================
 	*/
-	board.network = network
+	board.SetNetwork(*network)
 
 	/*
 	Load the card decks and add them to the board.
@@ -409,5 +410,9 @@ func playRound(terminal bufio.Scanner, board *model.Board) error {
 	*/
 	board.ItterateJudge()
 
+	return nil
+}
+
+func joinGame(terminal bufio.Scanner) error {
 	return nil
 }

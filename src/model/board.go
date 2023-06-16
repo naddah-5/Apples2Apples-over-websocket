@@ -306,6 +306,13 @@ func (b *Board) WhoWonGame() (Player, error) {
 }
 
 /*
+Sets the network component.
+*/
+func (b *Board) SetNetwork(network Network) {
+	b.network = network
+}
+
+/*
 Goes through all players and retrieves which card they want to play. 
 
 Returns an error if a player plays an invalid card index, this should cause a panic.
@@ -339,9 +346,21 @@ func (b *Board) ChooseCards() error {
 			pa.SubmitCard(&b.players[i], card)
 		}
 		if !b.players[i].Host() && !b.players[i].Bot() {
-			/*
-			TODO: Add online call here!
-			*/
+			hand := b.players[i].ShowHand()
+			var validOptions string = fmt.Sprint(len(hand)) + "\n"
+			var prompt string = validOptions + greenApple + "\n"
+			for i := 0; i < len(hand); i++ {
+				prompt = prompt + hand[i] + "\n"
+			}
+			cardIndex, err := b.network.Play(b.CurrentJudgeName(), prompt)
+			if err != nil {
+				return err
+			}
+			card, playedCardErr := b.players[i].PlayCard(cardIndex)
+			if playedCardErr != nil {
+				return playedCardErr
+			}
+			pa.SubmitCard(&b.players[i], card)
 		}
 	}
 	b.PlayedCards = *pa
@@ -377,7 +396,7 @@ func (b *Board) Judge() (int, error) {
 	currentJudge := b.players[b.currentJudgeIndex()]
 	redApples, err := b.PlayedCards.DisplayApples()
 	if err != nil {
-		return -1, errors.New("no apples played")
+		return 0, errors.New("no apples played")
 	}
 	
 	if currentJudge.Bot() {
@@ -388,13 +407,19 @@ func (b *Board) Judge() (int, error) {
 		return view.JudgeCards(greenApple, redApples), nil
 	}
 	if !currentJudge.Host() && !currentJudge.Bot() {
-		/*
-		TODO: implement network call.
-		*/
-		return -1, errors.New("online play not implemented")
+		var validOptions string = fmt.Sprint(len(redApples)) + "\n"
+		var prompt string = validOptions + greenApple + "\n"
+		for i := 0; i < len(redApples); i++ {
+			prompt = prompt + redApples[i] + "\n"
+		}
+		winner, err := b.network.Play(b.CurrentJudgeName(), prompt)
+		if err != nil {
+			return 0, err
+		}
+		return winner, nil
 	}
 	
-	return -1, errors.New("unexpected judge status")
+	return 0, errors.New("unexpected judge status")
 }
 
 

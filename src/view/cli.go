@@ -43,7 +43,7 @@ The message should display all available options
 and take the corresponding action on valid input.
 */
 func Greeting(scanner bufio.Scanner)  {
-	var GREETING string = "Hello, do you want to play a game. \n 1) Host game\n 2) Join game\n 3) Play bots\n 4) Exit"
+	var GREETING string = "Hello, do you want to play a game. \n 1) Play bots\n 2) Host game\n 3) Join game\n 4) Exit"
 	err := clear()
 	if err != nil {
 		fmt.Println(err)
