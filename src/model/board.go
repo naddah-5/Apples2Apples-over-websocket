@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strconv"
 
 	"main/view"
 )
@@ -93,15 +94,20 @@ func (b *Board) AllHandsFull() bool {
 /*
 Returns the string representation of players and their score.
 */
-func (b *Board) DisplayScoreBoard() []string {
+func (b *Board) DisplayScoreBoard() {
 	var playerScores []string
+	var onlineView string
 	playerScores = append(playerScores, "Player name\t\tScore")
+	onlineView = onlineView + "Player name\t\tScore\n"
 	for i := 0; i < len(b.players); i++ {
 		playerName := b.players[i].PlayerName()
 		playerScore := b.players[i].Score()
-		playerScores = append(playerScores, playerName + ": \t\t\t" + fmt.Sprint(playerScore))
+		scoreLine := playerName + ": \t\t\t" + fmt.Sprint(playerScore)
+		playerScores = append(playerScores, scoreLine)
+		onlineView += scoreLine+"\n"
 	}
-	return playerScores
+	view.ScoreBoard(playerScores)
+	b.network.MassDisplay(onlineView)
 }
 
 /*
@@ -373,12 +379,12 @@ func (b *Board) ChooseCards() error {
 		*/
 		if !b.players[i].Host() && !b.players[i].Bot() {
 			hand := b.players[i].ShowHand()
-			var validOptions string = fmt.Sprint(len(hand)) + "\n"
-			var prompt string = "Play" + validOptions + greenApple + "\n"
+			var validOptions string = fmt.Sprint(len(hand))
+			var prompt string = validOptions + "\n" + greenApple + "\n"
 			for i := 0; i < len(hand); i++ {
-				prompt = prompt + hand[i] + "\n"
+				prompt += "[" + strconv.Itoa(i) + "]" + hand[i] + "\n"
 			}
-			cardIndex, err := b.network.Play(b.CurrentJudgeName(), prompt)
+			cardIndex, err := b.network.Play(b.players[i].PlayerName(), prompt)
 			if err != nil {
 				return err
 			}
@@ -449,10 +455,10 @@ func (b *Board) Judge() (int, error) {
 	=======================================================================
 	*/
 	if !currentJudge.Host() && !currentJudge.Bot() {
-		var validOptions string = fmt.Sprint(len(redApples)) + "\n"
-		var prompt string = "Play" + validOptions + greenApple + "\n"
+		var validOptions string = fmt.Sprint(len(redApples)) 
+		var prompt string = validOptions + "\n" + greenApple + "\n"
 		for i := 0; i < len(redApples); i++ {
-			prompt = prompt + redApples[i] + "\n"
+			prompt += "[" + strconv.Itoa(i) + "]" + redApples[i] + "\n"
 		}
 		winner, err := b.network.Play(b.CurrentJudgeName(), prompt)
 		if err != nil {
@@ -480,4 +486,16 @@ Interface to close network connections.
 */
 func (b *Board) CloseConnections() {
 	b.network.CloseConnections()
+}
+
+func (b *Board) MassDisplay(info string) error {
+	err := b.network.MassDisplay(info)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *Board) GameOver(winner string) {
+	b.network.GameOver(winner)
 }

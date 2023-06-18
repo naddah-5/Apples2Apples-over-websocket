@@ -10,8 +10,8 @@ import (
 
 type Deck struct {
 	allowedCardType string
-	deck []Card
-	discard []Card
+	deck 		[]Card
+	discard 	[]Card
 }
 
 /*

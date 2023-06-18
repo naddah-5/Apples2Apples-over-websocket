@@ -8,7 +8,8 @@ import (
 )
 
 type Network struct {
-	players []PlayerConnection
+	players 	[]PlayerConnection
+	host		net.Conn
 }
 
 type PlayerConnection struct {
@@ -56,6 +57,33 @@ func (n *Network) handleConnection(conn net.Conn) {
 }
 
 /*
+Establish a connection with the host.
+
+Returns an error if there is a problem with the dial function.
+*/
+func (n *Network) DialHost() error {
+	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	if err != nil {
+		return err
+	}
+	n.host = conn
+	return nil
+}
+
+func (n *Network) Respond(response string) error {
+	conn := n.host
+	_, respErr := conn.Write([]byte(response))
+	if respErr != nil {
+		return respErr
+	}
+	return nil
+}
+
+func (n *Network) Listen() net.Conn {
+	return n.host
+}
+
+/*
 Returns how many player connections have been established.
 */
 func (n *Network) CountOnlinePlayers() int {
@@ -81,14 +109,14 @@ func (n *Network) Play(playerName string, prompt string) (int, error) {
 	if sendErr != nil {
 		return 0, sendErr
 	}
-	response := make([]byte, 1024)
+	response := make([]byte, 4096)
 	_, listErr := conn.Read(response)
 	if listErr != nil {
 		return 0, listErr
 	}
-	respInt, convErr := strconv.ParseInt(string(response), 10, 64)
-	if convErr != nil {
-		return 0, convErr
+	respInt, err :=  strconv.Atoi(string(response[0]))
+	if err != nil {
+		return 0, err
 	}
 	return int(respInt), nil
 }
@@ -110,6 +138,39 @@ func (n *Network) Display(playerName string, info string) error {
 		return sendErr
 	}
 	return nil
+}
+
+/*
+Send out standard info messages to all online players.
+*/
+func (n *Network) MassDisplay(info string) error {
+	for i := 0; i < len(n.players); i++ {
+		connErr := n.Display(n.players[i].playerName, info)
+		if connErr != nil {
+			return connErr
+		}
+	}
+	return nil
+}
+
+func (n *Network) End(playerName string, info string) error {
+	playerIndex, err := n.findPlayer(playerName)
+	if err != nil {
+		return err
+	}
+	info = "End\n" + info
+	conn := n.players[playerIndex].conn
+	_, sendErr := conn.Write([]byte(info))
+	if sendErr != nil {
+		return sendErr
+	}
+	return nil
+}
+
+func (n *Network) GameOver(winner string) {
+	for i := 0; i < len(n.players); i++ {
+		n.End(n.players[i].playerName, winner)
+	}
 }
 
 func (n  *Network) findPlayer(name string) (int, error) {

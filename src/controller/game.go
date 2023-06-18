@@ -2,11 +2,14 @@ package controller
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"main/model"
 	"main/view"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,7 +26,16 @@ func Game() {
 			board := setupOnlineGame(terminal)
 			playGame(terminal, board)
 		case "3":
-			joinGame(terminal)
+			network, connErr := joinGame(terminal)
+			if connErr != nil {
+				fmt.Println(connErr)
+				Game()
+			}
+			gameErr := playOnlineGame(&network)
+			if gameErr != nil {
+				panic(gameErr)
+			}
+
 		case "4":
 			os.Exit(0)
 		default:
@@ -181,6 +193,7 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 
 	onlinePlayerNames := network.ListPlayers()
 	for i := 0; i < int(onlinePlayers); i++ {
+		fmt.Println("CREATED PLAYER: ", onlinePlayerNames[i])
 		board.AddPlayer(*model.NewPlayer(onlinePlayerNames[i], false, false, 7))
 	}
 
@@ -308,6 +321,7 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 				panic(falseWin)
 			}
 			view.Winner(winner.PlayerName())
+			board.GameOver(winner.PlayerName())
 			board.CloseConnections()
 			os.Exit(0)
 		} else {
@@ -315,8 +329,7 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 			Start a new round.
 			=======================================================
 			*/
-			scoreBoard := board.DisplayScoreBoard()
-			view.ScoreBoard(scoreBoard)
+			board.DisplayScoreBoard()
 			roundErr := playRound(terminal, board)
 			if roundErr != nil {
 				panic(roundErr)
@@ -399,6 +412,50 @@ func playRound(terminal bufio.Scanner, board *model.Board) error {
 	return nil
 }
 
-func joinGame(terminal bufio.Scanner) error {
-	return nil
+func joinGame(terminal bufio.Scanner) (model.Network, error) {
+	network := new(model.Network)
+	connErr := network.DialHost()
+	if connErr != nil {
+		return *network, connErr
+	}
+	return *network, nil
+}
+
+func playOnlineGame(n *model.Network) error {
+	host := n.Listen()
+	buffer := make([]byte, 4096)
+
+	for {
+		_, err := host.Read(buffer)
+		if err != nil {
+			return err
+		}
+
+		receivedData := string(buffer)
+		parsed := strings.SplitAfterN(receivedData, "\n", -1)
+		for i := 0; i < len(parsed); i++ {
+			parsed[i] = strings.Trim(parsed[i], "\n")
+		}
+
+		if parsed[0] == "Play" {
+			validInput, err := strconv.ParseInt(parsed[1], 10, 64)
+			if err != nil {
+				panic(errors.New("Received invalid RPC format " + parsed[1]))
+			}
+			input := view.OnlinePlay(int(validInput), parsed[1:])
+			host.Write([]byte(input))
+
+		} else if parsed[0] == "Display" {
+			view.OnlineDisplay(parsed[0:])
+			
+		} else if parsed[0] == "End" {
+			fmt.Println("Game over,", parsed[1], "won!")
+			os.Exit(0)
+		} else {
+			fmt.Println("unknown RPC")
+			for i := 0; i < len(parsed); i++ {
+				fmt.Println("--"+parsed[i]+"--")
+			}
+		}
+	}
 }

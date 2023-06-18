@@ -194,22 +194,27 @@ Displays the incomming message and returns the users input.
 
 If the scan loop is somehow broken, returns default value 0.
 */
-func OnlinePlay(validInputLimit int, display string) int {
-	fmt.Println(display)
+func OnlinePlay(validInputLimit int, display []string) string {
+	for i := 0; i < len(display); i++ {
+		fmt.Println(display[i])
+	}
 	terminal := Terminal()
 	for terminal.Scan() {
-		sInput, _ := strconv.ParseInt(terminal.Text(), 10, 64)
-		var input int = int(sInput)
+		inputStr := terminal.Text()
+		input64, _ := strconv.ParseInt(inputStr, 10, 64)
+		var input int = int(input64)
 		if input >= 0 && input <= validInputLimit {
-			return input
+			return inputStr
 		}
 	}
-	return 0
+	return "0"
 }
 
 /*
 Display the received message.
 */
-func OnlineDisplay(display string) {
-	fmt.Println(display)
+func OnlineDisplay(display []string) {
+	for i := 0; i < len(display); i++ {
+		fmt.Println(display[i])
+	}
 }
