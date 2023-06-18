@@ -128,6 +128,9 @@ func (n *Network) findPlayerName(index int) (string, error) {
 	return n.players[index].playerName, nil
 }
 
+/*
+Returns a list of all online player's names
+*/
 func (n *Network) ListPlayers() []string {
 	var playerList []string
 	for i := 0; i < n.CountOnlinePlayers(); i++ {
@@ -138,4 +141,13 @@ func (n *Network) ListPlayers() []string {
 		playerList = append(playerList, name)
 	}
 	return playerList
+}
+
+/*
+Close the connections to all online players.
+*/
+func (n *Network) CloseConnections() {
+	for i := 0; i < len(n.players); i++ {
+		n.players[i].conn.Close()
+	}
 }

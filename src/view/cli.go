@@ -188,3 +188,28 @@ func ScoreBoard(score []string) {
 		fmt.Println(score[i])
 	}
 }
+
+/*
+Displays the incomming message and returns the users input.
+
+If the scan loop is somehow broken, returns default value 0.
+*/
+func OnlinePlay(validInputLimit int, display string) int {
+	fmt.Println(display)
+	terminal := Terminal()
+	for terminal.Scan() {
+		sInput, _ := strconv.ParseInt(terminal.Text(), 10, 64)
+		var input int = int(sInput)
+		if input >= 0 && input <= validInputLimit {
+			return input
+		}
+	}
+	return 0
+}
+
+/*
+Display the received message.
+*/
+func OnlineDisplay(display string) {
+	fmt.Println(display)
+}

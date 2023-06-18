@@ -422,11 +422,20 @@ func (b *Board) Judge() (int, error) {
 	return 0, errors.New("unexpected judge status")
 }
 
-
+/*
+Discards the current round.
+*/
 func (b *Board) DiscardRound() error {
 	_, discErr := b.PlayedCards.DiscardRound(&b.redApples)
 	if discErr != nil {
 		return discErr
 	}
 	return nil
+}
+
+/*
+Interface to close network connections.
+*/
+func (b *Board) CloseConnections() {
+	b.network.CloseConnections()
 }

@@ -289,17 +289,26 @@ func playGame(terminal bufio.Scanner, board *model.Board) {
 		*/
 		gameOver, winErr := board.GameWinner()
 		if winErr != nil {
+			/*
+			Attempt to recover from invalid state.
+			=======================================================
+			*/
 			resetWinErr := board.SetWinCondition()
 			if resetWinErr != nil {
 				panic(winErr)
 			}
 		}
 		if gameOver {
+			/*
+			Game over, display winner and terminate the program.
+			=======================================================
+			*/
 			winner, falseWin := board.WhoWonGame()
 			if falseWin != nil {
 				panic(falseWin)
 			}
 			view.Winner(winner.PlayerName())
+			board.CloseConnections()
 			os.Exit(0)
 		} else {
 			/*
