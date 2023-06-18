@@ -203,7 +203,7 @@ func OnlinePlay(validInputLimit int, display []string) string {
 		inputStr := terminal.Text()
 		input64, _ := strconv.ParseInt(inputStr, 10, 64)
 		var input int = int(input64)
-		if input >= 0 && input <= validInputLimit {
+		if !(input < 0) && input < validInputLimit {
 			return inputStr
 		}
 	}

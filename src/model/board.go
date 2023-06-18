@@ -107,7 +107,6 @@ func (b *Board) DisplayScoreBoard() {
 		onlineView += scoreLine+"\n"
 	}
 	view.ScoreBoard(playerScores)
-	b.network.MassDisplay(onlineView)
 }
 
 /*
@@ -380,10 +379,11 @@ func (b *Board) ChooseCards() error {
 		if !b.players[i].Host() && !b.players[i].Bot() {
 			hand := b.players[i].ShowHand()
 			var validOptions string = fmt.Sprint(len(hand))
-			var prompt string = validOptions + "\n" + greenApple + "\n"
+			var prompt string = validOptions + "\n" + "Current green apple - " + greenApple + "\n"
 			for i := 0; i < len(hand); i++ {
 				prompt += "[" + strconv.Itoa(i) + "]" + hand[i] + "\n"
 			}
+			prompt += "Please select a card to play:"
 			cardIndex, err := b.network.Play(b.players[i].PlayerName(), prompt)
 			if err != nil {
 				return err
@@ -456,10 +456,11 @@ func (b *Board) Judge() (int, error) {
 	*/
 	if !currentJudge.Host() && !currentJudge.Bot() {
 		var validOptions string = fmt.Sprint(len(redApples)) 
-		var prompt string = validOptions + "\n" + greenApple + "\n"
+		var prompt string = validOptions + "\n" + "Current green apple - " + greenApple + "\n"
 		for i := 0; i < len(redApples); i++ {
 			prompt += "[" + strconv.Itoa(i) + "]" + redApples[i] + "\n"
 		}
+		prompt += "Select the winning card:"
 		winner, err := b.network.Play(b.CurrentJudgeName(), prompt)
 		if err != nil {
 			return 0, err

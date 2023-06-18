@@ -193,7 +193,6 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 
 	onlinePlayerNames := network.ListPlayers()
 	for i := 0; i < int(onlinePlayers); i++ {
-		fmt.Println("CREATED PLAYER: ", onlinePlayerNames[i])
 		board.AddPlayer(*model.NewPlayer(onlinePlayerNames[i], false, false, 7))
 	}
 
@@ -442,11 +441,11 @@ func playOnlineGame(n *model.Network) error {
 			if err != nil {
 				panic(errors.New("Received invalid RPC format " + parsed[1]))
 			}
-			input := view.OnlinePlay(int(validInput), parsed[1:])
+			input := view.OnlinePlay(int(validInput), parsed[2:])
 			host.Write([]byte(input))
 
 		} else if parsed[0] == "Display" {
-			view.OnlineDisplay(parsed[0:])
+			view.OnlineDisplay(parsed[1:])
 			
 		} else if parsed[0] == "End" {
 			fmt.Println("Game over,", parsed[1], "won!")
