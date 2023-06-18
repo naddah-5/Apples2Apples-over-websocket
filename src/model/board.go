@@ -323,11 +323,25 @@ func (b *Board) ChooseCards() error {
 	currentJudge := b.CurrentJudgeName()
 	greenApple := b.CurrentGreenApple()
 	for i := 0; i < len(b.players); i++ {
+		/*
+		If the current player is the judge, display waiting message
+		and go to next player.
+		===============================================================
+		*/
 		if b.players[i].PlayerName() == currentJudge {
 			// skips the judge
-			view.WaitPlayerCards()
+			if b.players[i].Host() {
+				view.WaitPlayerCards()
+			} else if !b.players[i].Host() && !b.players[i].Bot() {
+				b.network.Display(b.players[i].PlayerName(), "Waiting for players to submit cards...")
+			}
 			continue
 		}
+
+		/*
+		If the current player is a bot, return a random card.
+		===============================================================
+		*/
 		if b.players[i].Bot() {
 			var randomCardIndex int = rand.Intn(b.players[i].CardsInHand())
 			card, cardErr := b.players[i].PlayCard(randomCardIndex)
@@ -336,6 +350,12 @@ func (b *Board) ChooseCards() error {
 			}
 			pa.SubmitCard(&b.players[i], card)
 		}
+
+		/*
+		If the player is the host, and not a bot, prompt user for a 
+		card.
+		===============================================================
+		*/
 		if b.players[i].Host() && !b.players[i].Bot() {
 			hand := b.players[i].ShowHand()
 			cardIndex := view.ChooseCard(greenApple, hand)
@@ -345,10 +365,16 @@ func (b *Board) ChooseCards() error {
 			}
 			pa.SubmitCard(&b.players[i], card)
 		}
+
+		/*
+		If the current player is online, send a play message and play 
+		the choosen card.
+		===============================================================
+		*/
 		if !b.players[i].Host() && !b.players[i].Bot() {
 			hand := b.players[i].ShowHand()
 			var validOptions string = fmt.Sprint(len(hand)) + "\n"
-			var prompt string = validOptions + greenApple + "\n"
+			var prompt string = "Play" + validOptions + greenApple + "\n"
 			for i := 0; i < len(hand); i++ {
 				prompt = prompt + hand[i] + "\n"
 			}
@@ -399,16 +425,32 @@ func (b *Board) Judge() (int, error) {
 		return 0, errors.New("no apples played")
 	}
 	
+	/*
+	If the current judge is a bot, choose a random card as the winner.
+	=======================================================================
+	*/
 	if currentJudge.Bot() {
 		view.DisplaySubmissions(greenApple, redApples)
 		return rand.Intn(len(b.PlayedCards.pp)), nil
 	}
+
+	/*
+	If the current judge is the host, and not a bot, prompt user for the 
+	winning card.
+	=======================================================================
+	*/
 	if currentJudge.Host() && !currentJudge.Bot() {
 		return view.JudgeCards(greenApple, redApples), nil
 	}
+	
+	/*
+	If the current judge is an online player, prompt that user for the 
+	winning card with a play message.
+	=======================================================================
+	*/
 	if !currentJudge.Host() && !currentJudge.Bot() {
 		var validOptions string = fmt.Sprint(len(redApples)) + "\n"
-		var prompt string = validOptions + greenApple + "\n"
+		var prompt string = "Play" + validOptions + greenApple + "\n"
 		for i := 0; i < len(redApples); i++ {
 			prompt = prompt + redApples[i] + "\n"
 		}
