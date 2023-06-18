@@ -2,6 +2,7 @@ package view
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -30,6 +31,9 @@ func clear() error {
 	// return errors.New("Unsupported OS")
 }
 
+/*
+Return an input scanner.
+*/
 func Terminal() bufio.Scanner {
 	terminal := bufio.NewReader(os.Stdin)
 	scanner := bufio.NewScanner(terminal)
@@ -56,9 +60,41 @@ func Greeting(scanner bufio.Scanner)  {
 /*
 Prompt user to choose a player name.
 */
-func ChooseName() {
+func ChooseName(terminal bufio.Scanner) (string, error) {
 	clear()
 	fmt.Println("Please enter player name:")
+	terminal.Scan()
+	playerName := terminal.Text()
+	fmt.Println("You entered", playerName)
+	fmt.Println("1) confirm name\n 2) select name\n 3) exit game")
+	for terminal.Scan() {
+		var input string = terminal.Text()
+		if input == "1" {
+			return playerName, nil
+		} else if input == "2" {
+			return ChooseName(terminal)
+		} else if input == "3" {
+			return "", errors.New("exit game")
+		}
+
+	}
+	return ChooseName(terminal)
+}
+
+/*
+Prompt the user for the number of online players.
+*/
+func OnlinePlayers(terminal bufio.Scanner) int {
+	fmt.Println("How many online players?")
+	terminal.Scan()
+	onlinePlayers, parseErr := strconv.ParseInt(terminal.Text(), 10, 64)
+	for parseErr != nil && int(onlinePlayers) < 1 {
+		fmt.Println("Please enter an integer larger than zero")		
+		fmt.Println("How many online players?")
+		terminal.Scan()
+		onlinePlayers, parseErr = strconv.ParseInt(terminal.Text(), 10, 64)
+	}
+	return int(onlinePlayers)
 }
 
 /*
@@ -123,7 +159,9 @@ func JudgeCards(greenApple string, redApples []string) int {
 	return choice
 }
 
-
+/*
+Displays the submitted apples to the player.
+*/
 func DisplaySubmissions(greenApple string, redApples []string) {
 	clear()
 	fmt.Println("Current green apple", greenApple)
@@ -134,10 +172,16 @@ func DisplaySubmissions(greenApple string, redApples []string) {
 	fmt.Println("Waiting for judgement...")
 }
 
+/*
+Display the game winner to the user.
+*/
 func Winner(name string) {
 	fmt.Println(name, "has won the game, congratulation!")
 }
 
+/*
+Displays all players and their current score to the user.
+*/
 func ScoreBoard(score []string) {
 	clear()
 	for i := 0; i < len(score); i++ {

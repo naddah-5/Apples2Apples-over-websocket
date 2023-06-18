@@ -7,7 +7,6 @@ import (
 	"main/view"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -39,16 +38,9 @@ func setupOfflineGame(terminal bufio.Scanner) *model.Board {
 	Prompt the player for a player name
 	=======================================================================
 	*/
-	view.ChooseName()
-	var playerName string
-	terminal.Scan()
-	playerName = terminal.Text()
-	fmt.Println("You entered", playerName)
-	fmt.Println("1) confirm name\n not 1) back")
-	terminal.Scan() 
-	var confirmation string = terminal.Text()
-	if confirmation != "1" {
-		return setupOfflineGame(terminal)
+	playerName, namErr := view.ChooseName(terminal)
+	if namErr != nil {
+		os.Exit(0)
 	}
 
 	/*
@@ -153,16 +145,9 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 	Prompt the player for a player name
 	=======================================================================
 	*/
-	view.ChooseName()
-	var playerName string
-	terminal.Scan()
-	playerName = terminal.Text()
-	fmt.Println("You entered", playerName)
-	fmt.Println("1) confirm name\n not 1) back")
-	terminal.Scan() 
-	var confirmation string = terminal.Text()
-	if confirmation != "1" {
-		return setupOnlineGame(terminal)
+	playerName, namErr := view.ChooseName(terminal)
+	if namErr != nil {
+		os.Exit(0)
 	}
 
 
@@ -170,15 +155,7 @@ func setupOnlineGame(terminal bufio.Scanner) *model.Board {
 	Establish connections.
 	=======================================================================
 	*/
-	fmt.Println("How many online players?")
-	terminal.Scan()
-	onlinePlayers, parseErr := strconv.ParseInt(terminal.Text(), 10, 64)
-	for parseErr != nil && int(onlinePlayers) < 1 {
-		fmt.Println("Please enter an integer larger than zero")		
-		fmt.Println("How many online players?")
-		terminal.Scan()
-		onlinePlayers, parseErr = strconv.ParseInt(terminal.Text(), 10, 64)
-	}
+	onlinePlayers := view.OnlinePlayers(terminal)
 	
 	network := new(model.Network)
 	go network.Listener()
